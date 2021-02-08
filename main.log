@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  4 FEB 2021 17:42
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  8 FEB 2021 14:41
 entering extended mode
 **./main.tex
 (main.tex
@@ -1773,8 +1773,8 @@ Package logreq Info: Writing requests to 'main.run.xml'.
  ) 
 Here is how much of TeX's memory you used:
  34196 strings out of 480893
- 658211 string characters out of 2898027
- 1328021 words of memory out of 3000000
+ 658679 string characters out of 2898027
+ 1328123 words of memory out of 3000000
  49422 multiletter control sequences out of 15000+200000
  549376 words of font info for 71 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
@@ -1790,7 +1790,7 @@ sers/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm14
 40.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-
 super/sfrm1728.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type
 1/public/cm-super/sfti1440.pfb>
-Output written on main.pdf (2 pages, 615063 bytes).
+Output written on main.pdf (2 pages, 618799 bytes).
 PDF statistics:
  55 PDF objects out of 1000 (max. 8388607)
  4 named destinations out of 1000 (max. 500000)
