@@ -327,4 +327,270 @@ One of the first encryption algorithms was used by Julius Caesar. In the Caesar 
 \end{center}
 
 In this case the algorithm is the Caesar Cipher and the key is 3.
+
+\chapter*{Lecture 2}
+The idea behind this course is to build step-by-step a system that is stronger and stronger until we'will arrive to systems that are used in practice.\\
+
+Defining a cipher means to define an encryption algorithm and a decryption algorithm.\\
+A \textbf{cryptosystem} (or \textbf{cipher}) can be defined as a quintuple \texttt{(P,C,K,E,D)} where:
+\begin{itemize}
+	\item \texttt{P} is the set of plaintexts (i.e. all the Italian words);
+	\item \texttt{C} is the set of ciphertexts;
+	\item \texttt{K} is the set of keys (we can have more than one key);
+	\item \texttt{E:K$\times$P$\rightarrow$C} is the encryption function;
+	\item \texttt{D:K$\times$C$\rightarrow$P} is the decryption function.
+\end{itemize}
+Let \texttt{x$\in$P, y$\in$C, k$\in$K}, we will write $E_k$(x) and $D_k$(y) to denote E(k,x) and D(k,y), the encryption and the decryption under the key k of x and y respectively.\\
+
+We require two properties for each cipher that uses a shared key:
+\begin{property}
+	$D_k(E_k(x)) = x$, decrypting a ciphertext with the right key gives the original plaintext.
+\end{property}
+\begin{property}
+	computing k or x given a ciphertext is infeasible, so complex that cannot be done in a reasonable time.
+\end{property}
+
+All the ciphers we will discuss have the first property, only "secure" ciphers have the second one (Caesar cipher doesn't). If someone, one day, will prove that P=NP, then most of the ciphers won't be secure anymore.
+
+\begin{example}
+	Referring to the Caesar cipher, we can define the encryption function as "the letter three positions ahead (of our letter x) in the alphabet" or \texttt{(x+3) mod26} and the decryption function as "the letter three position behind (of the letter to be decrypted)" or \texttt{(x-3) mod26}. Our key k=3.
+\end{example}
+
+If we find the message \texttt{"BHV BRX PDGH LW"} and we know that it is encrypted with the Caesar cipher we can easily decrypt it into \texttt{"YES YOU MADE IT"} just going back 3 positions. We can notice that we have two "B" and they correspond to the same decrypted letter "Y", in monoalphabetic ciphers this is a strong weakness.
+
+\begin{proof}[Proof of the first property applied to the Caesar cipher]
+	We have to prove that:
+	\begin{align}
+	x &= D_k(E_k(x)) \\
+	&=((x+3) \ \textrm{mod}26 - 3) \ \textrm{mod}26 \\
+	&=((x+3) - 3) \ \textrm{mod}26 \\
+	&=x \ \textrm{mod}26 \\
+	&=x
+	\end{align}
+	Since we have the modules repeated twice we can keep only the external one.
+\end{proof}
+To prove this property we can apply this reasoning to every cipher.\\
+
+\begin{definition}
+	Kerckhoffs' principle: a cipher should remain secure even if the algorithm becomes public.
+\end{definition}
+
+Kerckhoffs rules (1883):
+\begin{itemize}
+	\item The system should be, if not theoretically unbreakable, unbreakable in practice;
+	\item The design of a system should not require secrecy, and compromise of the system should not inconvenience the correspondents (Kerckhoffs' principle);
+	\item the key should be memorable without notes and should be easily changeable;
+	\item the cryptograms should be transmittable by telegraph;
+	\item the apparatus or documents should be portable and operable by a single person;
+	\item the system should be easy, neither requiring knowledge of a long list of rules nor involving mental strain.
+\end{itemize}
+
+
+The Caesar cipher is clearly insecure (it will be proved later) since once the cipher has been broken any previous exchanged message is also broken (as the cipher works the same way), the key should be changed and it is assumed to be the only secret.
+
+\subsubsection{Shift cipher}
+We can extend the Caesar cipher to a shift cipher with a generic key k, we can choose any key in the range $0\leq k\leq 25$. For simplicity we will consider letters as numbers (\texttt{A=0, B=1, .., Z=25}), this means that $P=C=K=Z_{26}$ ($Z_{26}$ is for all the integers between 0 and 25). For the encryption and decryption function we have:
+\begin{center}
+	$\textrm{E}_k(x) = (x+k) \textrm{mod}26$\\
+	$\textrm{D}_k(y) = (y-k) \textrm{mod}26$
+\end{center}
+The Caesar cipher is a subcase of a shift cipher with k=3.
+In  a shift cipher is useless to have k=0 because we would end up with equals plaintexts and ciphertexts.
+
+\begin{example}
+	Considering k=10, it gives the following substitution:
+	\begin{center}
+		\texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ}\\
+		$\downarrow$\\
+		\texttt{KLMNOPQRSTUVWXYZABCDEFGHIJ}
+	\end{center}
+\end{example}
+
+\begin{proof}[Proof of the first property applied to a shift cipher]
+	We have to prove that:
+	\setcounter{equation}{0}
+	\begin{align}
+		x &= D_k(E_k(x)) \\
+		&=D_k((x+k) \ \textrm{mod}26) \\
+		&=((x+k) \ \textrm{mod}26 - k) \ \textrm{mod}26 \\
+		&=((x+k) - k) \ \textrm{mod}26 \\
+		&=x \ \textrm{mod}26 \\
+		&=x
+	\end{align}
+\end{proof}
+Note that $\textrm{Z}_{26}$ is a group under the addition (but not under the multiplication).
+
+\begin{definition}
+	A \textbf{group} $\langle\textrm{G},*\rangle$ is a set G together with a (closed) binary operation * on G such that:
+	\begin{itemize}
+		\item the operator is associative ($(x*y)*z =x*(y*z)$ for all x,y,z in $\langle\textrm{G},*\rangle$);
+		\item there is an element e$\in$G such that $a*e = e*a = a$ for all a$\in$G. Such an element is the identity element;
+		\item for every a$\in$G, there is an element b$\in$G such that $a*b=e$. This b is said to be the inverse of a with respect to *. The inverse of a is sometimes denoted as $\textrm{a}^{-1}$.
+	\end{itemize}
+\end{definition}
+\vspace{5mm}
+The set $\langle\textrm{Z},+\rangle$, which is the set of integers under addition, forms a group:
+\begin{itemize}
+	\item addition is associative ($(x+y)+z = x+(y+z)$ for all x,y,z in $\langle\textrm{Z},+\rangle$);
+	\item the identity element is 0, since $0+a = a+0 = a$ for any a$\in$Z;
+	\item the inverse of any a$\in$Z is -a.
+\end{itemize}
+A group that is commutative with an additive operator is said to be an abelian group.
+
+\vspace{5mm}
+The set $\langle\textrm{Z},\cdot\rangle$, the set of all integers under multiplication, does not form a group. There is a multiplicative identity 1 but there is no multiplicative inverse for every element in Z.\\
+
+From now on we will work with abelian groups.
+
+\subsubsection{Possible attack to shift ciphers}
+If I can attack a shift cipher, I can implicitly attack the Caesar cipher.
+\begin{example}
+	If I am an attacker, I see the message \texttt{NGPPS} and I know that it is encrypted using a shift cipher but I don't know which key k is used I can try to get it by trial and error. I start with \texttt{k=1} and if decrypting the message I obtain something nonsense, I try with k=2 and so on. with k=4 I will reach that \texttt{NGPPS=HELLO}. Is it feasible? Yes because we only have 26 possible to keys to try. This type of attack is called \textbf{Brute force}.
+\end{example}
+
+In this case the problem with our encryption algorithm is the very small number of keys. Thus the second property doesn't hold (Kerckhoffs' principle: a cipher should remain secure even if the algorithm becomes public). The weakness is that we know that each letter is moved by the same distance.
+
+\subsubsection{Substitution cipher}
+A substitution cipher is a generalization to overcome the previous limitation: instead of moving all the letters by the same distance, now we use a generic permutation of the alphabet to map the letters. For example:
+\begin{center}
+	\texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ}\\
+	$\downarrow$\\
+	\texttt{SWNAMLXCVJBUYKPDOQERIFHGZT}
+\end{center}
+"\texttt{HOME}" becomes "\texttt{CPYM}". In this case the key is the complete permutation, otherwise the receiver is not able to decrypt our message. As for the previous ciphers, to decrypt we just apply the inverse substitution.\\
+We have P=C=$\textrm{Z}_{26}$ and K=\{p|p is a permutation of 0,..,25\} with:
+\begin{itemize}
+	\item $\textrm{E}_k$(x)=p(x);
+	\item $\textrm{D}_k$(y)=$\textrm{p}^{-1}$(y).
+\end{itemize}
+
+Can we "Brute force" also this type of ciphers? No, we would have to try 26! keys, which is approximately $4\times10^{26}>2^{88}$. This number of keys is very heavy to brute force, even with powerful parallel computers. We have to find something different to attack substitution ciphers. How can we do it?\\
+
+It is a monoalphabetic cipher (it maps a letter to the very same letter), this preserves the statistics of the plaintext and makes it possible to reconstruct the key by observing the statistics in the ciphertext. For example, in Italian, almost all the words end with a vowel, and the vowels (a,e,i,o,u) are easy to identify as they are much more frequent than the other letters.\\
+
+Let us assume a cryptoanalyst knows the used cipher (e.g. a monoalphabetic substitution cipher) and the language used in plaintext (e.g Italian), but he doesn't know the plaintext and the key.
+
+\begin{example}
+	Given a ciphertext C, let us compute the frequency of letters, for example lette S appears 0 times and letter C appears 15 times. Is it possible that the cipher transforms A into S, and Z into C (A is never found and Z is found 15 times)? It is possible but very unlikely.
+\end{example}
+
+To compute the statistics for letters in Italian language it has been used a text of 14.998 letters, 1/3 from the book "Pinocchio" and 2/3 from the book "Il nome della rosa". The letters frequency are reported in the following table.
+\newpage
+\begin{table}[h!]
+	\centering
+	\begin{tabular}{||c | c | c||} 
+		\hline
+		\textbf{Letter} & \textbf{Absolute frequency} & \textbf{Percentage frequency} \\ 
+		\hline\hline
+		A & 1714 & 0.114 \\ 
+		\hline
+		B & 160 & 0.011 \\ 
+		\hline
+		C & 637 & 0.042 \\ 
+		\hline
+		D & 566 & 0.038 \\ 
+		\hline
+		E & 1658 & 0.111 \\ 
+		\hline
+		F & 141 & 0.009 \\ 
+		\hline
+		G & 272 & 0.018 \\ 
+		\hline
+		H & 160 & 0.011 \\ 
+		\hline
+		I & 1563 & 0.104 \\ 
+		\hline
+		L & 966 & 0.064 \\ 
+		\hline
+		M & 436 & 0.029 \\ 
+		\hline
+		N & 966 & 0.064 \\ 
+		\hline
+		O & 1486 & 0.099 \\ 
+		\hline
+		P & 421 & 0.028 \\ 
+		\hline
+		Q & 85 & 0.006 \\ 
+		\hline
+		R & 978 & 0.065 \\ 
+		\hline
+		S & 771 & 0.051 \\ 
+		\hline
+		T & 1024 & 0.068 \\ 
+		\hline
+		U & 528 & 0.035 \\ 
+		\hline
+		V & 343 & 0.023 \\ 
+		\hline
+		Z & 123 & 0.008 \\ 
+		\hline
+		\textbf{Total} & \textbf{14998} & \textbf{0.998} \\ 
+		\hline
+	\end{tabular}
+	\label{tab:italianstats}
+	\caption{Letters statistics for Italian language.}
+\end{table}
+
+The most used letter is A and the less used is Q. We can also build the graph in figure \ref{fig:itastatsgraph} to represent this statistic.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{images/Lec2/itastatsgraph.png}
+	\caption{Percentage frequencies of letters in Italian language.}
+	\label{fig:itastatsgraph}
+\end{figure}
+Knowing this, we can study the frequency of each letter in my ciphertext and map them using the frequency of my language.
+\begin{itemize}
+	\item In Italian the frequency of letters I and L increases at the beginning of the sentences (articles "il", "lo", "la"), and the frequency of "A", "E", "I", "O" at the end of the words;
+	\item there are words that may appear more frequently (e.g. the word "airplane" in a  military message);
+	\item there exist digraph and trigraph that are more frequent. 
+\end{itemize}
+
+How can we decrypt a message?
+\begin{itemize}
+	\item we order the letters of the ciphertext into decreasing frequencies;
+	\item we substitute with letters in decreasing order as in the corresponding tables (depending on the language);
+	\item there might be mistakes with letters that have the same frequency ("N" and "L" or "H" and "B" in Italian).
+\end{itemize}
+
+We need a long ciphertext in order to obtain reasonable frequencies.
+It is possible that at the first try we obtain some nonsense words but similar to some words of complete meaning, we can then change letters to correct these words. Repeating some times this step we would end up with the correct plaintext.
+
+We have seen that we can easily break monoalphabetic ciphers applying this method, so the second property doesn't hold. Attacks to substitution ciphers are called \textbf{Statistical attacks}
+
+\begin{proof}[Proof of the first property applied to a substitution cipher]
+	We have to prove that:
+	\setcounter{equation}{0}
+	\begin{align}
+		x &= D_k(E_k(x)) \\
+		&=D_k(p(x)) \\
+		&=p^{-1}(p(x)) \\
+		&=x\\
+	\end{align}
+\end{proof}
+
+We have seen that monoalphabetic ciphers are prone to statistical attacks, since they preserve the statistical structure of the plaintext. A solution are the polyalphabetic ciphers in which the same symbol is not always mapped to the same encrypted symbol.
+
+\subsubsection{Polyalphabetic ciphers}
+An example of polyalphabetic cipher is the \textbf{Vigenére cipher} (XVI century). It works on "blocks" of \textit{m} letters with a key of length \textit{m}.
+\begin{example}
+	The key is \texttt{FLUTE} (m=5). The plaintext is split into blocks of length 5 and the key \texttt{FLUTE} is repeated as necessary and used to encrypt each block.
+	\begin{center}
+		\texttt{THISISAVERYSECRETMESSAGE}\\
+		+\\
+		\texttt{FLUTEFLUTEFLUTEFLUTEFLUT}\\
+		=\\
+		\texttt{YSCLMXLPXVDDYVVJEGXWXLAX}
+	\end{center}
+	\vspace{5mm}
+	Each letter of the ciphertext is given by the sum of the position of the letter in the plaintext plus the position of the letter in the key.
+\end{example}
+This type of ciphers works better than monoalphabetic ciphers because one letter is not always mapped to the same one unless they are at a distance that is multiple of m.\\
+
+Formally, P=C=K=Z$^m_{26}$, where Z$^m_{26}$ is Z$_{26}\times$Z$_{26}\times$..$\times$Z$_{26}$, m times.
+\begin{itemize}
+	\item E$_{k1,..,km}$(x$_1$,..,x$_m$) = (x$_1$+k$_1$,..,x$_m$+k$_m$) mod26;
+	\item D$_{k1,..,km}$(y$_1$,..,y$_m$) = (x$_1$-k$_1$,..,x$_m$-k$_m$) mod26.
+\end{itemize}
+
+If an attacker knows m, he has to try 26$^m$ possible keys, if m is big enough, it is impossible to brute force it.
 \end{document}
