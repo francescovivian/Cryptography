@@ -10,11 +10,30 @@
 \usepackage{packages/sleek-theorems}
 \usepackage{packages/sleek-listings}
 
+% Custom colors
+\usepackage{color}
+\definecolor{deepblue}{rgb}{0,0,0.5}
+\definecolor{deepred}{rgb}{0.6,0,0}
+\definecolor{deepgreen}{rgb}{0,0.5,0}
+
+%Per scrivere codice
+\usepackage{listings}
+
+\usepackage{pythonhighlight}
 % Per figure nel testo
 \usepackage{wrapfig}
 
 % Per aggiungere ``Page 1 of 100''
 \usepackage{lastpage}
+
+
+\lstset{
+	frame = single,
+	numbers=left,                   % where to put the line-numbers
+	numberstyle=\footnotesize,  % the style that is used for the line-numbers
+	stepnumber=1,                   % the step between two line-numbers. If it is 1, each line
+	numbersep=8pt                  % how far the line-numbers are from the code  
+}
 
 %\cfoot{\thepage\ of \label{LastPage}}
 \cfoot{Page \thepage \hspace{1pt} of \pageref{LastPage}}
@@ -67,6 +86,7 @@
 \newtheorem{definition}{\textbf{Definition}}
 \newtheorem{property}{\textbf{Property}}
 \newtheorem{example}{\textbf{Example}}
+\newtheorem{exercise}{\textbf{Exercise}}
 
 \begin{document}
     \maketitle
@@ -593,4 +613,238 @@ Formally, P=C=K=Z$^m_{26}$, where Z$^m_{26}$ is Z$_{26}\times$Z$_{26}\times$..$\
 \end{itemize}
 
 If an attacker knows m, he has to try 26$^m$ possible keys, if m is big enough, it is impossible to brute force it.
+
+\chapter*{Lecture 3}
+
+Vigenére cipher cause an almost "flat" distribution of letters frequency, for this reason we would make many mistakes if we try do decrypt a ciphertext in the same way as we do for monoalphabetic ciphers.
+
+As said in the last part of the previous lesson, if we want to brute force this cipher, (assuming we know m) we would have to try 26$^m$ possible keys and that's infeasible, if we don't know m, it would we even worse. It is sufficient to choose m big enough to prevent brute force attacks, note that the number of keys grows exponentially with respect to the length.
+
+\subsubsection{Breaking Vigenére cipher}
+Even if the Vigenére cipher hides the statistic structure of the plaintext better than monoalphabetic ciphers, it still preserve most of it.
+
+There are two famous methods to break this cipher, the first is due to Friedrick Kasiski (1863) and the second to Wolfe Friedman (1920). We will see the latter since it is more suitable to be mechanized. Both are based in \textbf{recover the length m of the key} and then \textbf{recover the key}.
+
+The Friedman method uses statistical measures to recover the length m of the key. We consider the index of coincidence:
+\setcounter{equation}{0}
+\begin{equation}
+	I_c(x)=\frac{\sum_{i=1}^{26} f_i(f_i-1)}{n(n-1)} \approx \sum_{i=1}^{26}p_i^2
+\end{equation}
+where $f_i$ is the frequency of the i-th letter in a text of length n, i.e., the number of times it occurs in such text and $p_i = f_i/n$ is the probability of the i-th letter. Intuitively, this measure gives the probability that two letters, chosen at random from the text, are the same. I compute this probability over all the letters.
+
+\begin{example}
+	The IC of \textbf{"the index of coincidence"} is given by:\\
+	c(3*2) + d(2*1) + e(4*3) + f(1*0) + h(1*0) + i(3*2) + n(3*2) + o(2*1) + t(1*0) + x(1*0) = \textbf{34}\\
+	divided by n(n-1)=21*20 = \textbf{420}\\
+	which gives us an IC of 34/420 = \textbf{0.0809}
+	
+	\vspace{5mm}
+	The IC of \textbf{"bmqvszfpjtcsswgwvjlio"} is given by:\\
+	b(1*0) + c(1*0) + f(1*0) + g(1*0) + i(1*0) + j(2*1) + l(1*0) + m(1*0) + o(1*0) + p(1*0) + q(1*0) + s(3*2) + t(1*0) + v(2*1) + w(2*1) + z(1*0) = \textbf{12}\\
+	divided by n(n-1)=21*20 = \textbf{420}\\
+	which gives us an IC of 12/420 = \textbf{0.0286} 
+\end{example}
+
+Once I have the IC of my ciphertext, I have to compare it to the ICs of various languages to discover to which it corresponds.
+
+The value of the index is maximum (value 1) for texts composed of just a single letter repeated n times.  The value of the index is minimum (value 1/26 $\approx$ 0.038) for texts composed of letters chosen with uniform probability 1/26.
+ 
+The index of coincidence is thus a measure of how non uniformly letters are distributed in a text, each natural language has a characteristic index of coincidence, some examples:
+\begin{center}
+	English $\rightarrow$ 0.065\\
+	Russian $\rightarrow$ 0.0529\\
+	German $\rightarrow$ 0.0762\\
+	Spanish $\rightarrow$ 0.0775
+\end{center}
+
+We can also use the Friedman method to find moro or polyalphabetic ciphers. We know that if we use frequencies analysis, if frequencies are flat, we have a polyalphabetic cipher, if we have peaks and valleys of frequencies, we have a monoalphabetic cipher. Considering the Friedman method, if the value of the index is minimum $\approx$ 0.038, we have a polyalphabetic cipher, if it is $\approx$ 0.065, we have a monoalphabetic cipher (same IC as English, just a permutation of letters).
+
+With the Friedman method we can estimate m, the length of the key in a Vigenére cipher. The idea is to recover m by brute forcing, following this algorithm (in Python):
+
+\begin{python}
+	m=1
+	LIMIT = 0.06 #this is to check that ICs are above 0.06 and thus close to 0.065 (assuming the text is in English)
+	found = False
+	while (not found):
+		sub = subciphers() #takes the m subciphertexts sub[m] obtained by selecting one letter every m
+		found = True
+		for i in range(0,m): #compute the IC of all subtexts
+			if IC(sub[i]) < LIMIT:
+				#if one of the IC is not as expected try to increase the length
+				found = False
+				m += 1
+				break
+	#survived the check, all ICs are above LIMIT
+	output (m)
+\end{python}
+It works because, once we reach the correct m, all the letters we are considering will be encrypted using the same key, "F" in the below example. So, computing the IC, we will obtain a value similar to the English IC value.
+\begin{center}
+	\texttt{\textcolor{red}{T}HISI\textcolor{red}{S}AVER\textcolor{red}{Y}SECR\textcolor{red}{E}TMES\textcolor{red}{S}AGE}\\
+	+\\
+	\texttt{\textcolor{red}{F}LUTE\textcolor{red}{F}LUTE\textcolor{red}{F}LUTE\textcolor{red}{F}LUTE\textcolor{red}{F}LUT}\\
+	=\\
+	\texttt{\textcolor{red}{Y}SCLM\textcolor{red}{X}LPXV\textcolor{red}{D}DYVV\textcolor{red}{J}EGXW\textcolor{red}{X}LAX}
+\end{center}
+
+In order to obtain suitable results, we need to have a long enough ciphertext, otherwise we could not be able to succeed.
+
+Now that we have m, we need to find the key. We already said that we cannot brute force it, it would be infeasible. What should we do?
+\begin{itemize}
+	\item we divide the text into blocks of length m, as the length of the key (we just found it);
+	\item we need to build new cryptograms with the first letter of each block, one with the second letter and so on;
+	\item we analyse the new cryptograms as before and we find the shift in each position.
+\end{itemize}
+
+We are considering texts composed of letter at distance m from the first one, the second one, and so on. They have different shifts, we need to find the relative right shift.
+
+The idea is to shift one subcipher until the mutual index of coincidence with the first subcipher becomes close to the one of the plaintext language, when this happens, we know that the applied shift is the relative shift between the two subciphers and , consequently, between the corresponding letters of the key.
+
+The mutual index of coincidence is defined as:
+
+\setcounter{equation}{0}
+\begin{equation}
+MI_c(x,x') = \frac{\sum_{i=1}^{26}f_if'_i}{nn'} = \sum_{i=1}^{26} p_ip'_i
+\end{equation}
+It represents the probability that two letters taken from two texts x and x' are the same.
+
+The following algorithm selects the relative shift that maximizes the mutual index of coincidence.
+\begin{python}
+	key = [] #empty list
+	for i in range(0,m): #for any letter of the key
+		k = 0 #current relative shift
+		mick = 0 #maximum index so far (we start with 0)
+		for j in range(0,26): #for any possible relative shift
+			#compute the mutual index of coincidence between the first subcipher
+			#sub[0] and the i-th subcipher shifted by j
+			mic = MIc(sub[0], shift(j,sub[i]))
+			if mic > mick: #if it is the biggest so far
+				k = j 		#we remember the relative shift
+				mick = mic 	#.. and the maximum
+		key.append(k) 		#we append to the list the shift we have found
+\end{python}
+
+We repeat this for every letter of the key and we obtain the list of relative shifts, for example, if we obtain [0,4,6,3,9], it means that the second letter of the key is equal to the first plus 4, the third is equal to the first plus 6 and so on. But what is the first letter? The final step is to try all the possible 26 letter of the key, that gives us 26 possible keys.
+
+\subsubsection{Known-plaintext attacks}
+Until now we have considered attackers that only know the ciphertext y and try to find either the plaintext x or the key k. It is often the case that an attacker can guess part of the plaintext (e.g., the "standard" header of a message), if a message is split into blocks which are encrypted under the same key, it is reasonable to assume that an attacker can deduce part of the plaintext. For example if the attacker is trying to decrypt an email, he can guess the initial par that often starts with "Dear ...".
+If the attacker knows some plaintexts, this gives him the knowledge of some pairs (x,y) plaintext, ciphertext. Given this, the attacker should be able to decrypt other messages or to recover the key k (no matter which cipher is used).
+
+The \textbf{Hill} cipher is a polyalphabetic cipher and it is a generalization of the Vigenére by introducing linear transformations of blocks of plaintext. We have P=C=Z$_m^{26}$, while K=\{K|K is an invertible mod26 matrix m$\times$m\}. The encryption and decryption are the following:
+\begin{itemize}
+	\item E$_K$(x$_1$,..,x$_m$) = (x$_1$,..,x$_m$)K mod26;
+	\item D$_K$(y$_1$,..,y$_m$) = (y$_1$,..,y$_m$)K$^{-1}$ mod26.
+\end{itemize}
+
+\begin{example}
+	Let us assume M=(x$_1$,x$_2$)=(5,9) and 
+		K =$
+		\begin{bmatrix}
+			5 & 11\\
+			8 & 3	
+		\end{bmatrix}$
+	(we will only consider 2$\times$2 matrices for simplicity). Thus, E$_K$(5,9) = $(5,9)\times
+	\begin{bmatrix}
+		5 & 11\\
+		8 & 3	
+	\end{bmatrix}$ mod26 = $(5\times5+9\times8,5\times11+9\times3)$ mod26 = $(25+72,55+27)$ mod26 = $(97,82)$ mod 26 = $(19,4)$
+\end{example}
+
+In order to decrypt a message, we need to compute the inverse of the matrix that is our key.
+\begin{example}
+	We have (y$_1$,y$_2$) = (19,4) and K=$
+	\begin{bmatrix}
+		5 & 11\\
+		8 & 3	
+	\end{bmatrix}$. To compute K$^{-1}$:\\
+	K$^{-1} = $det$^{-1}$(K) $\begin{bmatrix}
+		3 & -11\\
+		-8 & 5	
+	\end{bmatrix}$ mod26 = det$^{-1}$(K)$
+	\begin{bmatrix}
+		3 & 15\\
+		18 & 5	
+	\end{bmatrix}$ mod26.\\
+\end{example}
+
+We assume our matrix K is invertible. In the last step we changed the negative numbers to positive ones considering the mod26.
+
+Now we can calculate det(K) = $(5\times3-11\times8)$mod26 = $(15-88)$mod26 = -73 mod26 = 5.
+How do we compute det$^{-1}$(K)? To find the inverse mod26 of 5, we need to find a number in the interval [0,25] that multiplied by 5 mod26 gives 1. The number we are searching is 21, $5\times21$ mod26 = 105 mod26 = 1. Thus det$^{-1}$(K) = 21.\\
+Note that it is not always the case that the multiplicative inverse modulo exists, we will discuss this more in detail later on, introducing the public key cryptography and RSA.
+
+Now we can solve K$^{-1}$ = det$^{-1}$(K)$
+\begin{bmatrix}
+	3 & 15\\
+	18 & 5	
+\end{bmatrix}$ mod26$ = 21
+\begin{bmatrix}
+	3 & 15\\
+	18 & 5	
+\end{bmatrix}$ mod26 $=
+\begin{bmatrix}
+	63 & 315\\
+	378 & 105	
+\end{bmatrix}$ mod 26 $=
+\begin{bmatrix}
+	11 & 3\\
+	14 & 1	
+\end{bmatrix}$. Thus D$_K$(19,4)  = (19,4)$
+\begin{bmatrix}
+	11 & 3\\
+	14 & 1	
+\end{bmatrix} = (19\times11+4\times14,19\times3+4\times1)$ mod26 $=(265,61)$ mod26 $=(5,9)$.
+
+\begin{exercise}
+	Encrypt and decrypt message (2,5) using a Hill cipher with $
+	\begin{bmatrix}
+		5 & 11\\
+		8 & 3	
+	\end{bmatrix}$
+	
+	\vspace{5mm}
+	\textbf{Encryption}\\
+	E$_K$(2,5) = $(2,5) \times 
+	\begin{bmatrix}
+		5 & 11\\
+		8 & 3	
+	\end{bmatrix}$ mod26 $= (2\times5+5\times8,2\times11+5\times3)$ mod26 $=(10+40,22+15)$ mod26 $=(50,37)$ mod26 $=(24,11)$.
+	
+	\vspace{5mm}
+	\textbf{Decryption}\\
+	K$^{-1} = $det$^{-1}$(K) $\begin{bmatrix}
+		3 & -11\\
+		-8 & 5	
+	\end{bmatrix}$ mod26 = det$^{-1}$(K)$
+	\begin{bmatrix}
+		3 & 15\\
+		18 & 5	
+	\end{bmatrix}$ mod26.\\
+	det(K) = $(5\times3-11\times8)$mod26 = $(15-88)$mod26 = -73 mod26 = 5.\\
+	det$^{-1}$(K) = 21, $5\times21$ mod26 = 105 mod26 = 1.\\
+	K$^{-1}$ = det$^{-1}$(K)$
+	\begin{bmatrix}
+	3 & 15\\
+	18 & 5	
+	\end{bmatrix}$ mod26$ = 21
+	\begin{bmatrix}
+	3 & 15\\
+	18 & 5	
+	\end{bmatrix}$ mod26 $=
+	\begin{bmatrix}
+	63 & 315\\
+	378 & 105	
+	\end{bmatrix}$ mod 26 $=
+	\begin{bmatrix}
+	11 & 3\\
+	14 & 1	
+	\end{bmatrix}$.\\
+	D$_K$(24,11)  = (24,11)$
+	\begin{bmatrix}
+	11 & 3\\
+	14 & 1	
+	\end{bmatrix} = (24\times11+11\times14,24\times3+11\times1)$ mod26 $=(418,83)$ mod26 $=(2,5)$.
+\end{exercise}
+
 \end{document}
+
+

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  5 MAR 2021 01:38
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  10 MAR 2021 11:50
 entering extended mode
 **./main.tex
 (main.tex
@@ -1533,6 +1533,11 @@ File: listings.cfg 2020/03/24 1.8d listings configuration
 ))
 Package: listings 2020/03/24 1.8d (Carsten Heinz)
 )
+("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/pythonhighlight\py
+thonhighlight.sty"
+Package: pythonhighlight 2017/02/09 python code highlighting; provided by Olivi
+er Verdier <olivier.verdier@gmail.com>
+)
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/wrapfig\wrapfig.st
 y"
 \wrapoverhang=\dimen315
@@ -1549,6 +1554,7 @@ Package: lastpage 2015/03/29 v1.2m Refers to last page's name (HMM; JPG)
 \c@definition=\count507
 \c@property=\count508
 \c@example=\count509
+\c@exercise=\count510
 Package csquotes Info: Checking for multilingual support...
 Package csquotes Info: ... found 'babel' package.
 Package csquotes Info: Adjusting default style.
@@ -1556,22 +1562,22 @@ Package csquotes Info: Redefining alias 'default' -> 'english'.
  (main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 71.
-LaTeX Font Info:    ... okay on input line 71.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 91.
+LaTeX Font Info:    ... okay on input line 91.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 91.
+LaTeX Font Info:    ... okay on input line 91.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 91.
+LaTeX Font Info:    ... okay on input line 91.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 91.
+LaTeX Font Info:    ... okay on input line 91.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 91.
+LaTeX Font Info:    ... okay on input line 91.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 91.
+LaTeX Font Info:    ... okay on input line 91.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 91.
+LaTeX Font Info:    ... okay on input line 91.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 91.
+LaTeX Font Info:    ... okay on input line 91.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -1611,16 +1617,16 @@ LaTeX Font Info:    ... okay on input line 71.
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/context/base/mkii\supp-p
 df.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count510
+\scratchcounter=\count511
 \scratchdimen=\dimen317
 \scratchbox=\box126
-\nofMPsegments=\count511
-\nofMParguments=\count512
+\nofMPsegments=\count512
+\nofMParguments=\count513
 \everyMPshowfont=\toks55
-\MPscratchCnt=\count513
+\MPscratchCnt=\count514
 \MPscratchDim=\dimen318
-\MPnumerator=\count514
-\makeMPintoPDFobject=\count515
+\MPnumerator=\count515
+\makeMPintoPDFobject=\count516
 \everyMPtoPDFconversion=\toks56
 )
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/epstopdf-pkg\epsto
@@ -1630,7 +1636,7 @@ Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
 85.
 )
 \AtBeginShipoutBox=\box127
-Package hyperref Info: Link coloring ON on input line 71.
+Package hyperref Info: Link coloring ON on input line 91.
 
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/hyperref\nameref.s
 ty"
@@ -1644,11 +1650,11 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ettitlestring.sty"
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count516
+\c@section@level=\count517
 )
-LaTeX Info: Redefining \ref on input line 71.
-LaTeX Info: Redefining \pageref on input line 71.
-LaTeX Info: Redefining \nameref on input line 71.
+LaTeX Info: Redefining \ref on input line 91.
+LaTeX Info: Redefining \pageref on input line 91.
+LaTeX Info: Redefining \nameref on input line 91.
  (main.out) (main.out)
 \@outlinefile=\write5
 \openout5 = `main.out'.
@@ -1682,30 +1688,30 @@ Package biblatex Info: Trying to load bibliographic data...
 Package biblatex Info: ... file 'main.bbl' not found.
 
 No file main.bbl.
-Package biblatex Info: Reference section=0 on input line 71.
-Package biblatex Info: Reference segment=0 on input line 71.
+Package biblatex Info: Reference section=0 on input line 91.
+Package biblatex Info: Reference segment=0 on input line 91.
 ABD: EveryShipout initializing macros
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/upquote\upquote.st
 y"
 Package: upquote 2012/04/19 v1.3 upright-quote and grave-accent glyphs in verba
 tim
 )
-\c@lstlisting=\count517
+\c@lstlisting=\count518
 Package lastpage Info: Please have a look at the pageslts package at
 (lastpage)             https://www.ctan.org/pkg/pageslts
-(lastpage)             ! on input line 71.
-LaTeX Font Info:    Trying to load font information for U+msa on input line 71.
+(lastpage)             ! on input line 91.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 91.
 
 
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsa.fd"
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 71.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 91.
 
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/amsfonts\umsb.fd"
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-LaTeX Font Info:    Trying to load font information for U+esint on input line 7
+LaTeX Font Info:    Trying to load font information for U+esint on input line 9
 1.
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/esint\uesint.fd"
 File: uesint.fd 
@@ -1745,25 +1751,25 @@ File: uesint.fd
 <./resources/img/logo.png, id=6, 954.767pt x 957.979pt>
 File: ./resources/img/logo.png Graphic file (type png)
 <use ./resources/img/logo.png>
-Package pdftex.def Info: ./resources/img/logo.png  used on input line 72.
+Package pdftex.def Info: ./resources/img/logo.png  used on input line 92.
 (pdftex.def)             Requested size: 105.05383pt x 105.41316pt.
 
-Overfull \hbox (30.0pt too wide) in paragraph at lines 72--72
+Overfull \hbox (30.0pt too wide) in paragraph at lines 92--92
 [][] 
  []
 
 Package mdframed Info: mdframed detected package amsthm 
  changed the theorem header of amsthm
-(mdframed)              on input line 72.
+(mdframed)              on input line 92.
 Package mdframed Info: mdframed inside a box 
- mdframed uses option nobreak mdframed on input line 72.
+ mdframed uses option nobreak mdframed on input line 92.
 
-Overfull \hbox (30.0pt too wide) in paragraph at lines 72--72
+Overfull \hbox (30.0pt too wide) in paragraph at lines 92--92
 []$[]$ 
  []
 
 
-Overfull \hbox (30.0pt too wide) in paragraph at lines 72--72
+Overfull \hbox (30.0pt too wide) in paragraph at lines 92--92
 [][] 
  []
 
@@ -1774,67 +1780,67 @@ Overfull \hbox (30.0pt too wide) in paragraph at lines 72--72
 {C:/Users/vivia/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map} <./resources
 /img/logo.png>]
 Package hyperref Info: bookmark level for unknown definition defaults to 0 on i
-nput line 76.
+nput line 96.
 Package hyperref Info: bookmark level for unknown property defaults to 0 on inp
-ut line 84.
+ut line 104.
 Package hyperref Info: bookmark level for unknown example defaults to 0 on inpu
-t line 87.
+t line 107.
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.112 \end{itemize}
+l.132 \end{itemize}
                     [1
 
 
 ] [2]
-Underfull \hbox (badness 10000) in paragraph at lines 155--156
+Underfull \hbox (badness 10000) in paragraph at lines 175--176
 
  []
 
 <images/attacks1.png, id=59, 322.20375pt x 181.67876pt>
 File: images/attacks1.png Graphic file (type png)
 <use images/attacks1.png>
-Package pdftex.def Info: images/attacks1.png  used on input line 159.
+Package pdftex.def Info: images/attacks1.png  used on input line 179.
 (pdftex.def)             Requested size: 168.4381pt x 94.97803pt.
 
-Underfull \hbox (badness 1484) in paragraph at lines 160--160
+Underfull \hbox (badness 1484) in paragraph at lines 180--180
 []\T1/cmr/m/n/12 Figure 1: |Ex-pected in-for-ma-tion
  []
 
 
 Package wrapfig Warning: Collision between wrapping environments on input line 
-165.
+185.
 
 <images/attacks2.png, id=61, 322.20375pt x 182.6825pt>
 File: images/attacks2.png Graphic file (type png)
 <use images/attacks2.png>
-Package pdftex.def Info: images/attacks2.png  used on input line 167.
+Package pdftex.def Info: images/attacks2.png  used on input line 187.
 (pdftex.def)             Requested size: 168.4381pt x 95.50276pt.
 
-Package wrapfig Warning: Stationary wrapfigure forced to float on input line 17
+Package wrapfig Warning: Stationary wrapfigure forced to float on input line 19
 3.
 
 <images/attacks3.png, id=63, 322.20375pt x 181.67876pt>
 File: images/attacks3.png Graphic file (type png)
 <use images/attacks3.png>
-Package pdftex.def Info: images/attacks3.png  used on input line 191.
+Package pdftex.def Info: images/attacks3.png  used on input line 211.
 (pdftex.def)             Requested size: 168.4381pt x 94.97803pt.
 
-Package wrapfig Warning: Stationary wrapfigure forced to float on input line 19
+Package wrapfig Warning: Stationary wrapfigure forced to float on input line 21
 7.
 
 <images/attacks4.png, id=64, 322.20375pt x 181.67876pt>
 File: images/attacks4.png Graphic file (type png)
 <use images/attacks4.png>
-Package pdftex.def Info: images/attacks4.png  used on input line 215.
+Package pdftex.def Info: images/attacks4.png  used on input line 235.
 (pdftex.def)             Requested size: 168.4381pt x 94.97803pt.
 [3 <./images/attacks1.png> <./images/attacks2.png> <./images/attacks3.png>]
 
-Package wrapfig Warning: Stationary wrapfigure forced to float on input line 22
+Package wrapfig Warning: Stationary wrapfigure forced to float on input line 24
 1.
 
-LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 23
+LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 25
 1.
 
 ("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/inconsolata\t1zi4.
@@ -1842,64 +1848,64 @@ fd"
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 12.0pt on input line 231.
+(Font)              scaled to size 12.0pt on input line 251.
 <images/attacks5.png, id=87, 322.20375pt x 181.67876pt>
 File: images/attacks5.png Graphic file (type png)
 <use images/attacks5.png>
-Package pdftex.def Info: images/attacks5.png  used on input line 237.
+Package pdftex.def Info: images/attacks5.png  used on input line 257.
 (pdftex.def)             Requested size: 168.4381pt x 94.97803pt.
 
 
-Package wrapfig Warning: Stationary wrapfigure forced to float on input line 24
+Package wrapfig Warning: Stationary wrapfigure forced to float on input line 26
 3.
 
 <images/typeofattacks.png, id=88, 814.04124pt x 201.75375pt>
 File: images/typeofattacks.png Graphic file (type png)
 <use images/typeofattacks.png>
-Package pdftex.def Info: images/typeofattacks.png  used on input line 260.
+Package pdftex.def Info: images/typeofattacks.png  used on input line 280.
 (pdftex.def)             Requested size: 447.72406pt x 110.96489pt.
 [4 <./images/attacks4.png> <./images/attacks5.png> <./images/typeofattacks.png>
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 266--267
+Underfull \hbox (badness 10000) in paragraph at lines 286--287
 
  []
 
 <images/enc1.png, id=108, 643.40375pt x 161.60374pt>
 File: images/enc1.png Graphic file (type png)
 <use images/enc1.png>
-Package pdftex.def Info: images/enc1.png  used on input line 303.
+Package pdftex.def Info: images/enc1.png  used on input line 323.
 (pdftex.def)             Requested size: 386.04523pt x 96.96298pt.
 [5]
 <images/enc2.png, id=126, 643.40375pt x 322.20375pt>
 File: images/enc2.png Graphic file (type png)
 <use images/enc2.png>
-Package pdftex.def Info: images/enc2.png  used on input line 312.
+Package pdftex.def Info: images/enc2.png  used on input line 332.
 (pdftex.def)             Requested size: 386.04523pt x 193.32373pt.
  [6 <./images/enc1.png> <./images/enc2.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 332--333
+Underfull \hbox (badness 10000) in paragraph at lines 352--353
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 343--344
+Underfull \hbox (badness 10000) in paragraph at lines 363--364
 
  []
 
 [7
 
 ]
-Underfull \hbox (badness 10000) in paragraph at lines 372--373
+Underfull \hbox (badness 10000) in paragraph at lines 392--393
 
  []
 
 [8]
-Overfull \hbox (0.12712pt too wide) in paragraph at lines 438--439
+Overfull \hbox (0.12712pt too wide) in paragraph at lines 458--459
 \T1/cmr/m/n/12 A group that is com-mu-ta-tive with an ad-di-tive op-er-a-tor is
  said to be an abelian group. 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 441--442
+Underfull \hbox (badness 10000) in paragraph at lines 461--462
 
  []
 
@@ -1908,38 +1914,38 @@ Underfull \hbox (badness 10000) in paragraph at lines 441--442
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.452 
+l.472 
       pdfTeX warning (ext4): destination with the same identifier (name{equatio
 n.0.0.2}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.452 
+l.472 
       pdfTeX warning (ext4): destination with the same identifier (name{equatio
 n.0.0.3}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.452 
+l.472 
       pdfTeX warning (ext4): destination with the same identifier (name{equatio
 n.0.0.4}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.452 
+l.472 
       pdfTeX warning (ext4): destination with the same identifier (name{equatio
 n.0.0.5}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.452 
+l.472 
       ]
-Underfull \hbox (badness 10000) in paragraph at lines 467--468
+Underfull \hbox (badness 10000) in paragraph at lines 487--488
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 469--470
+Underfull \hbox (badness 10000) in paragraph at lines 489--490
 
  []
 
@@ -1947,7 +1953,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 469--470
 <images/Lec2/itastatsgraph.png, id=189, 493.845pt x 316.18124pt>
 File: images/Lec2/itastatsgraph.png Graphic file (type png)
 <use images/Lec2/itastatsgraph.png>
-Package pdftex.def Info: images/Lec2/itastatsgraph.png  used on input line 537.
+Package pdftex.def Info: images/Lec2/itastatsgraph.png  used on input line 557.
 
 (pdftex.def)             Requested size: 345.68913pt x 221.32535pt.
  [11 <./images/Lec2/itastatsgraph.png>]pdfTeX warning (ext4): destination with 
@@ -1955,83 +1961,126 @@ the same identifier (name{equation.0.0.1}) has been already used, duplicate ign
 ored
 <to be read again> 
                    \relax 
-l.568 	\end{align}
+l.588 	\end{align}
                   pdfTeX warning (ext4): destination with the same identifier (
 name{equation.0.0.2}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.568 	\end{align}
+l.588 	\end{align}
                   pdfTeX warning (ext4): destination with the same identifier (
 name{equation.0.0.3}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.568 	\end{align}
+l.588 	\end{align}
                   pdfTeX warning (ext4): destination with the same identifier (
 name{equation.0.0.4}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.568 	\end{align}
+l.588 	\end{align}
                   pdfTeX warning (ext4): destination with the same identifier (
 name{equation.0.0.5}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.568 	\end{align}
+l.588 	\end{align}
                    [12]
-Underfull \hbox (badness 10000) in paragraph at lines 587--588
+Underfull \hbox (badness 10000) in paragraph at lines 607--608
 
  []
 
+[13]pdfTeX warning (ext4): destination with the same identifier (name{equation.
+0.0.1}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.630 \begin{equation}
+                       [14
 
+]
+("C:\Users\vivia\AppData\Local\Programs\MiKTeX 2.9\tex/latex/listings\lstlang1.
+sty"
+File: lstlang1.sty 2020/03/24 1.8d listings language file
+)
+LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
+(Font)              scaled to size 10.0pt on input line 664.
+
+
+LaTeX Font Warning: Font shape `T1/zi4/m/sl' undefined
+(Font)              using `T1/zi4/m/n' instead on input line 666.
+
+LaTeX Font Info:    Font shape `T1/zi4/m/sl' will be
+(Font)              scaled to size 10.0pt on input line 666.
+LaTeX Font Info:    Font shape `T1/zi4/b/n' will be
+(Font)              scaled to size 10.0pt on input line 668.
+[15]pdfTeX warning (ext4): destination with the same identifier (name{equation.
+0.0.1}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.705 \begin{equation}
+                       [16]
+Underfull \hbox (badness 10000) in paragraph at lines 754--767
+
+ []
+
+Package hyperref Info: bookmark level for unknown exercise defaults to 0 on inp
+ut line 798.
+[17] 
 AED: lastpage setting LastPage
-[13]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 596.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 596.
+[18]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 848.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 848.
  (main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 596.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 596.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 848.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 848.
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
+
+
+LaTeX Font Warning: Some font shapes were not available, defaults substituted.
+
 Package logreq Info: Writing requests to 'main.run.xml'.
 \openout1 = `main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 34535 strings out of 480893
- 664374 string characters out of 2898027
- 1340165 words of memory out of 3000000
- 49634 multiletter control sequences out of 15000+200000
- 552934 words of font info for 77 fonts, out of 3000000 for 9000
+ 35315 strings out of 480893
+ 672655 string characters out of 2898027
+ 1391885 words of memory out of 3000000
+ 50360 multiletter control sequences out of 15000+200000
+ 554318 words of font info for 80 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 81i,12n,77p,827b,1649s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 81i,12n,96p,827b,1668s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/inconsolata
 /i4-t1-0.enc}{C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/
 cm-super/cm-super-t1.enc}{C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/font
 s/enc/dvips/cm-super/cm-super-ts1.enc}<C:/Users/vivia/AppData/Local/Programs/Mi
-KTeX 2.9/fonts/type1/public/inconsolata/Inconsolata-zi4r.pfb><C:/Users/vivia/Ap
-pData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi12.pfb><C:/U
-sers/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmm
-i8.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/ams
-fonts/cm/cmr12.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type
-1/public/amsfonts/cm/cmr8.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9
-/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/vivia/AppData/Local/Progra
-ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy8.pfb><C:/Users/vivia/AppData/
-Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Us
-ers/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfbi120
-0.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-s
-uper/sfbx1200.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
-/public/cm-super/sfbx2488.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9
-/fonts/type1/public/cm-super/sfcc1440.pfb><C:/Users/vivia/AppData/Local/Program
-s/MiKTeX 2.9/fonts/type1/public/cm-super/sfcc1728.pfb><C:/Users/vivia/AppData/L
-ocal/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfcc2074.pfb><C:/Users/viv
-ia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1200.pfb><
+KTeX 2.9/fonts/type1/public/inconsolata/Inconsolata-zi4b.pfb><C:/Users/vivia/Ap
+pData/Local/Programs/MiKTeX 2.9/fonts/type1/public/inconsolata/Inconsolata-zi4r
+.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfo
+nts/cm/cmex10.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
+/public/amsfonts/cm/cmmi12.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.
+9/fonts/type1/public/amsfonts/cm/cmmi8.pfb><C:/Users/vivia/AppData/Local/Progra
+ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr12.pfb><C:/Users/vivia/AppData/
+Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.pfb><C:/Users/viv
+ia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb>
+<C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/c
+m/cmsy8.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/publi
+c/amsfonts/symbols/msam10.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9
+/fonts/type1/public/cm-super/sfbi1200.pfb><C:/Users/vivia/AppData/Local/Program
+s/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1200.pfb><C:/Users/vivia/AppData/L
+ocal/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx2488.pfb><C:/Users/viv
+ia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfcc1440.pfb><
 C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sf
-rm1440.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public
-/cm-super/sfrm1728.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/
-type1/public/cm-super/sfti1200.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTe
-X 2.9/fonts/type1/public/cm-super/sfti1440.pfb>
-Output written on main.pdf (14 pages, 899354 bytes).
+cc1728.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public
+/cm-super/sfcc2074.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/
+type1/public/cm-super/sfrm1000.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTe
+X 2.9/fonts/type1/public/cm-super/sfrm1200.pfb><C:/Users/vivia/AppData/Local/Pr
+ograms/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1440.pfb><C:/Users/vivia/AppD
+ata/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1728.pfb><C:/User
+s/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfti1200.
+pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-sup
+er/sfti1440.pfb>
+Output written on main.pdf (19 pages, 971922 bytes).
 PDF statistics:
- 297 PDF objects out of 1000 (max. 8388607)
- 106 named destinations out of 1000 (max. 500000)
+ 382 PDF objects out of 1000 (max. 8388607)
+ 150 named destinations out of 1000 (max. 500000)
  63 words of extra memory for PDF output out of 10000 (max. 10000000)
 
