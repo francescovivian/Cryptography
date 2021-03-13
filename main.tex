@@ -20,11 +20,14 @@
 \usepackage{listings}
 
 \usepackage{pythonhighlight}
+
 % Per figure nel testo
 \usepackage{wrapfig}
 
 % Per aggiungere ``Page 1 of 100''
 \usepackage{lastpage}
+
+\usepackage{mathtools}
 
 
 \lstset{
@@ -795,7 +798,7 @@ Now we can solve K$^{-1}$ = det$^{-1}$(K)$
 \end{bmatrix} = (19\times11+4\times14,19\times3+4\times1)$ mod26 $=(265,61)$ mod26 $=(5,9)$.
 
 \begin{exercise}
-	Encrypt and decrypt message (2,5) using a Hill cipher with $
+	Encrypt and decrypt message (2,5) using a Hill cipher with K = $
 	\begin{bmatrix}
 		5 & 11\\
 		8 & 3	
@@ -845,6 +848,340 @@ Now we can solve K$^{-1}$ = det$^{-1}$(K)$
 	\end{bmatrix} = (24\times11+11\times14,24\times3+11\times1)$ mod26 $=(418,83)$ mod26 $=(2,5)$.
 \end{exercise}
 
+\chapter*{Lecture 4}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{images/Lec4/typesofattacks.png}
+	\caption{Types of Cryptonalysis attacks.}
+	\label{fig:typesofattacks}
+\end{figure}
+
+Up to now we have seen \textbf{ciphertext-only} attacks and \textbf{known-plaintext} attacks (in the last part of the previous lecture).\\
+In a ciphertext-only attack, the attacker is assumed to have access only to a set of ciphertexts (e.g., monoalphabetic ciphers, polyalphabetic ciphers), the limit is that it is easy to find the correspondence between letters in the plaintext and in the ciphertext.\\
+In a known-plaintext attack, the attacker knows some pairs (x',y'), (x'',y''), .. of plaintexts/ciphertexts (e.g., Hill ciphers), the limit in this case is that it is a linear transformation of plaintext block into a cipher block.
+
+A chosen-plaintext attack (CPA) is an attack model for cryptoanalysis which presumes that the attacker can ask and obtain the ciphertexts for given plaintexts.\\
+A chosen-ciphertext attack (CCA) is an attack model for cryptoanalysis where the cryptoanalyst can gather information by obtaining the decryption of chosen ciphertexts.
+
+\begin{exercise}
+	Encrypt and decrypt message (1,3) using a Hill cipher with K = $
+	\begin{bmatrix}
+	1 & 2\\
+	4 & 3	
+	\end{bmatrix}$
+	
+	\vspace{5mm}
+	\textbf{Encryption}\\
+	E$_K$(1,3) = $(1,3) \times 
+	\begin{bmatrix}
+	1 & 2\\
+	4 & 3	
+	\end{bmatrix}$ mod26 $= (1\times1+3\times4,1\times2+3\times3)$ mod26 $=(1+12,2+9)$ mod26 $=(13,11)$ mod26 $=(13,11)$.
+	
+	\vspace{5mm}
+	\textbf{Decryption}\\
+	K$^{-1} = $det$^{-1}$(K) $\begin{bmatrix}
+	3 & -2\\
+	-4 & 1	
+	\end{bmatrix}$ mod26 = det$^{-1}$(K)$
+	\begin{bmatrix}
+	3 & 24\\
+	22 & 1	
+	\end{bmatrix}$ mod26.\\
+	det(K) = $(1\times3-2\times4)$mod26 = $(3-8)$mod26 = -5 mod26 = 21.\\
+	det$^{-1}$(K) = 5, $21\times5$ mod26 = 105 mod26 = 1.\\
+	K$^{-1}$ = det$^{-1}$(K)$
+	\begin{bmatrix}
+	3 & 24\\
+	22 & 1	
+	\end{bmatrix}$ mod26$ = 5
+	\begin{bmatrix}
+	3 & 24\\
+	22 & 1	
+	\end{bmatrix}$ mod26 $=
+	\begin{bmatrix}
+	15 & 120\\
+	110 & 5	
+	\end{bmatrix}$ mod 26 $=
+	\begin{bmatrix}
+	15 & 16\\
+	6 & 5	
+	\end{bmatrix}$.\\
+	D$_K$(13,11)  = (13,11)$
+	\begin{bmatrix}
+	15 & 16\\
+	6 & 5	
+	\end{bmatrix} = (13\times15+11\times6,13\times16+11\times5)$ mod26 $=(261,263)$ mod26 $=(1,3)$.
+\end{exercise}
+
+\subsubsection{Attack to the Hill cipher}
+If I am an attacker and I have a specific number of pairs (plaintext, ciphertext), I can attack the Hill cipher. With a m$\times$m matrix, I need m pairs, if I have a 2$\times$2 matrix, I will need 2 pairs (plaintext, ciphertext) to be able to extract the key. Once I have the key, I can decrypt all the messages that will be sent later on.
+
+We know that:
+\begin{center}
+	($y_1^1$, ..., $y_m^1$) = ($x_1^1$, ..., $x_m^1$)K mod26\\
+	...\\
+	($y_1^m$, ..., $y_m^m$) = ($x_1^m$, ..., $x_m^m$)K mod26\\
+\end{center}
+which can be written as Y = XK mod26 with:
+\begin{center}
+	X = $\begin{bmatrix}
+		x_1^1 & .. & x_m^1\\
+		.. & .. & ..\\
+		x_1^m & .. & x_m^m	
+	\end{bmatrix}$ and Y = $
+	\begin{bmatrix}
+		y_1^1 & .. & y_m^1\\
+		.. & .. & ..\\
+		y_1^m & .. & y_m^m	
+	\end{bmatrix}$
+\end{center}
+
+If X$^{-1}$ exists, we can write X$^{-1}$Y mod26 = X$^{-1}$XK mod26 and then K = X$^{-1}$Y mod26.
+
+\begin{example}
+	Let's define:
+	\begin{center}
+		x$_1$=(5,9) $\rightarrow$ y$_1$=(19,4)\\
+		x$_2$=(2,5) $\rightarrow$ y$_2$=(24,11)
+	\end{center}
+	We can write (19,4) = (5,9)K mod26 and (24,11) = (2,5)K mod26.\\
+	We can construct X and Y matrices as follows:
+	\begin{center}
+		X = $\begin{bmatrix}
+		5 & 9\\
+		2 & 5	
+		\end{bmatrix}$ and Y = $
+		\begin{bmatrix}
+		19 & 4\\
+		24 & 11	
+		\end{bmatrix}$.
+	\end{center}
+	Now, if X$^{-1}$ exists, we can recover the key K. We compute X$^{-1}$ in the same way we did previously for K$^{-1}$.\\
+	X$^{-1}$ = det$^{-1}$(X) $\begin{bmatrix}
+		5 & -9\\
+		-2 & 5	
+	\end{bmatrix}$ mod26 = det$^{-1}$(X) $\begin{bmatrix}
+	5 & 17\\
+	24 & 5	
+	\end{bmatrix}$ mod26.
+	
+	det(X) = ($5\times5-9\times2$) = (25-18) = 7.\\
+	det$^{-1}$(X)  is a number $a$ such that 7$\times a = 1$ mod26, this number $a = 15$.
+	
+	Thus X$^{-1}$ = det$^{-1}$(X)$\begin{bmatrix}
+		5 & 17\\
+		24 & 5
+	\end{bmatrix}$ mod26 = 15 $\begin{bmatrix}
+		5 & 17\\
+		24 & 5	
+	\end{bmatrix}$ mod26 = $\begin{bmatrix}
+	75 & 255\\
+	360 & 75	
+	\end{bmatrix}$ mod26 = $\begin{bmatrix}
+		23 & 21\\
+		22 & 23	
+	\end{bmatrix}$.
+	
+	\vspace{5mm}
+	Then, K = X$^{-1}$Y mod 26 = $\begin{bmatrix}
+		23 & 21\\
+		22 & 23	
+	\end{bmatrix} \begin{bmatrix}
+	19 & 4\\
+	24 & 11	
+	\end{bmatrix}$ mod26 = $\begin{bmatrix}
+		23\times19+21\times24 & 23\times4+21\times11\\
+		22\times19+23\times24 & 22\times4+23\times11	
+	\end{bmatrix}$ mod26 = $\begin{bmatrix}
+		941 & 323\\
+		970 & 341	
+	\end{bmatrix}$ mod 26 = $\begin{bmatrix}
+		5 & 11\\
+		8 & 3	
+	\end{bmatrix}$.\\
+	
+	So, our key K = $\begin{bmatrix}
+		5 & 11\\
+		8 & 3	
+	\end{bmatrix}$.
+\end{example}
+
+Modern ciphers always contain a non-linear component to prevent this kind of attacks.
+
+If th matrix X is not invertible, if the attacker has no more pairs of (plaintext, ciphertext) he lose, otherwise he can try constructing other X matrices that maybe are invertible.
+
+\subsubsection{Block ciphers}
+\textbf{Block ciphers} are cryptosystems that "reuse" the same key to encrypt letters or blocks of the plaintext. For example shift ciphers are part of block ciphers. They are weak because if an attacker know that it is always used the same key, he could recover the key and decrypt al the messages.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.6]{images/Lec4/blockciphers.png}
+	\caption{Example of block ciphers.}
+	\label{fig:blockciphers}
+\end{figure}
+\subsubsection{Stream ciphers}
+\begin{definition}
+	\textbf{Stream ciphers} are cryptosystems that use a stream of key $z_1, z_2, ..., z_n$ instead of a single one.
+\end{definition}
+The idea is to encrypt the first letter of the plaintext with $z_1$, the second with $z_2$ and so on, it doesn't matter if we encrypt a letter or a block of text, what matters is that the key used is always different.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.6]{images/Lec4/streamciphers.png}
+	\caption{Example of stream ciphers.}
+	\label{fig:streamciphers}
+\end{figure}
+
+Having a different key for each letter or block of the plaintext is of course appealing but not much practical. The stream of keys is thus usually derived starting from an initial key k, but it can also depend on previous parts of the plaintext. In general we say that
+\begin{center}
+	z$_i$ = f$_i$(k,x$_i$, ..., x$_{i-1}$).
+\end{center}
+That means that the i-th key depends on k and on the previous i-1 letters or blocks. So z$_1$ = f$_1$(k), we can compute it without knowledge of the plaintext, to compute z$_2$, instead, we need to know x$_1$ because z$_2$ = f$_2$(k,x$_1$). The values are thus computed in the following sequence: z$_1$, x$_1$, z$_2$, x$_2$, ...\\
+This slow down a bit the procedure because I can't do anything in parallel.
+
+Block ciphers are a subset of stream ciphers in which i have z$_i$=k for each i. 
+
+A stream cipher is \textbf{periodic} if its key stream has the form:
+\begin{center}
+	\texttt{z$_1$, z$_2$, .., z$_d$,z$_1$, z$_2$, .., z$_d$,z$_1$, ...}
+\end{center}
+So if it repeats after \textbf{d} steps. This form of cipher reminds us to the \textbf{Vigenére cipher}. It can be seen as a stream cipher acting on single letters and with a periodic key stream.
+
+\begin{exercise}
+	Formalize the cipher giving (P,C,K,E,D) and defining the key stream z$_i$.
+	\begin{itemize}
+		\item P=C=K=Z$_{26}$;
+		\item E$_{zi}$(x$_i$) = (x$_i$+z$_i$) mod26;
+		\item D$_{zi}$(y$_i$) = (y$_i$-z$_i$) mod26;
+		\item z$_i$ = k$_{(i \ \text{mod} \ m)}$.
+	\end{itemize}
+\end{exercise}
+
+A stream cipher is \textbf{synchronous} if its key stream does not depend on the plaintexts (for example z$_i$ = f$_i$(k) for all i). So the key stream can be generated starting from k and independently on the plaintext. It is useful to improve efficiency because we do not need to obtain x$_i$ to compute z$_{i+1}$, so the key stream can be generated offline, before the actual ciphertext is received. We can consider Caesar cipher Hill cipher and also Vigenére cipher part of synchronous ciphers.
+
+\subsubsection{Asynchronous stream ciphers}
+In general asynchronous stream ciphers generate keys that depends either from k and from the previous plaintexts:
+\begin{center}
+	z$_i$ = f$_i$(k, x$_1$, ..., x${i-1}$)
+\end{center}
+This means that, if we are decrypting, we need to decrypt and, at the same time, compute the keys stream as a key can depend on previous plaintexts. An example is the \textbf{Autokey cipher}. We define it in the same way of a shift cipher, so P=C=K=Z$_{26}$ and
+\begin{itemize}
+	\item E$_{zi}$(x$_i$) = (x$_i$ + z$_i$) mod26;
+	\item D$_{zi}$(y$_i$) = (y$_i$ - z$_i$) mod26.
+\end{itemize}
+We define the key stream as:
+\[ z_i = \begin{cases*}
+k & if  i=0  \\
+x_{i-1} & if i$\ge$2
+\end{cases*} \]%
+
+The first key is the initial key k and the next keys are the same as the previous plaintext.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.6]{images/Lec4/encautokey.png}
+	\caption{Encryption in an autokey cipher.}
+	\label{fig:encautokey}
+\end{figure}
+
+\begin{exercise}
+	Let's assume the plaintext is the word "networksecurity", what is the encryption using k=5?\\
+	First of all we need to substitute our word with the corresponding position in the alphabet and it is: "13 4 19 22 14 17 10 18 4 2 20 17 8 19 24". We will encrypt our string as follows:\\
+	
+	E(13) = (13+5) mod26 = 18\\
+	E(4) = (4+13) mod26 = 17\\
+	...\\
+	E(24) = (24+19) mod26 = 17\\
+	
+	At this point we just need to transform back our numbers into letters and we obtain the ciphertext.
+\end{exercise}
+
+\begin{exercise}
+	Try to extract the plaintext from this word encoded using Autokey. We do not know the key k.
+	\begin{center}
+		\texttt{FTPNIH}
+	\end{center}
+
+	Since we do not know the key k, we have to try all the 26 possible k to see which decryption produces a meaningful word.
+	
+	\begin{itemize}
+		\item k=1 will produce \texttt{FOBMWL}, nonsense;
+		\item k=2 will produce \texttt{EPANVM}, nonsense;
+		\item k=3 will produce \texttt{DQZOUN}, nonsense;
+		\item k=4 will produce \texttt{CRYPTO}, it has sense!
+	\end{itemize}
+\end{exercise}
+
+\begin{exercise}
+	Suppose that we know that \texttt{FRIDAY} has been encrypted as \texttt{PQCFKU} using the Hill cipher, What is K? Assume K is a 2$\times$2 matrix.
+	
+	We can consider the pairs:\\
+	\texttt{(F,R) $\rightarrow$ (P,Q) = (5,17) $\rightarrow$ (15,16)}\\
+	\texttt{(I,D) $\rightarrow$ (C,F) = (8,3) $\rightarrow$ (2,5)}\\
+	\texttt{(A,Y) $\rightarrow$ (K,U) = (0,24) $\rightarrow$ (10,20)}\\
+	
+	We can construct X and Y matrices as follows:
+	\begin{center}
+		X = $\begin{bmatrix}
+		5 & 17\\
+		8 & 3	
+		\end{bmatrix}$ and Y = $
+		\begin{bmatrix}
+		15 & 16\\
+		2 & 5	
+		\end{bmatrix}$.
+	\end{center}
+	Now, if X$^{-1}$ exists, we can recover the key K. We compute X$^{-1}$ in the same way we did previously for K$^{-1}$.\\
+	X$^{-1}$ = det$^{-1}$(X) $\begin{bmatrix}
+	3 & -17\\
+	-8 & 5	
+	\end{bmatrix}$ mod26 = det$^{-1}$(X) $\begin{bmatrix}
+	3 & 9\\
+	18 & 5	
+	\end{bmatrix}$ mod26.
+	
+	det(X) = ($5\times3-17\times8$) = (15-136) = -121 mod26 = -17 mod26 = 9.\\
+	det$^{-1}$(X)  is a number $a$ such that 9$\times a = 1$ mod26, this number is $a=3$.\\
+	
+	Thus X$^{-1}$ = det$^{-1}$(X)$\begin{bmatrix}
+	3 & 9\\
+	18 & 5
+	\end{bmatrix}$ mod26 = 3 $\begin{bmatrix}
+	3 & 9\\
+	18 & 5	
+	\end{bmatrix}$ mod26 = $\begin{bmatrix}
+	9 & 27\\
+	54 & 15	
+	\end{bmatrix}$ mod26 = $\begin{bmatrix}
+	9 & 1\\
+	2 & 15	
+	\end{bmatrix}$.
+	
+	\vspace{5mm}
+	Then, K = X$^{-1}$Y mod 26 = $\begin{bmatrix}
+	9 & 1\\
+	2 & 15	
+	\end{bmatrix} \begin{bmatrix}
+	15 & 16\\
+	2 & 5	
+	\end{bmatrix}$ mod26 = $\begin{bmatrix}
+	9\times15+1\times2 & 9\times16+1\times5\\
+	2\times15+15\times2 & 2\times16+15\times5	
+	\end{bmatrix}$ mod26 = $\begin{bmatrix}
+	137 & 149 \\
+	60 & 107	
+	\end{bmatrix}$ mod 26 = $\begin{bmatrix}
+	7 & 19\\
+	8 & 3	
+	\end{bmatrix}$.\\
+	
+	So, our key K = $\begin{bmatrix}
+	7 & 19\\
+	8 & 3	
+	\end{bmatrix}$.
+	
+\end{exercise}
 \end{document}
 
 
