@@ -1106,10 +1106,10 @@ The first key is the initial key k and the next keys are the same as the previou
 	Since we do not know the key k, we have to try all the 26 possible k to see which decryption produces a meaningful word.
 	
 	\begin{itemize}
-		\item k=1 will produce \texttt{FOBMWL}, nonsense;
-		\item k=2 will produce \texttt{EPANVM}, nonsense;
-		\item k=3 will produce \texttt{DQZOUN}, nonsense;
-		\item k=4 will produce \texttt{CRYPTO}, it has sense!
+		\item k=0 will produce \texttt{FOBMWL}, nonsense;
+		\item k=1 will produce \texttt{EPANVM}, nonsense;
+		\item k=2 will produce \texttt{DQZOUN}, nonsense;
+		\item k=3 will produce \texttt{CRYPTO}, it has sense!
 	\end{itemize}
 \end{exercise}
 
@@ -1180,8 +1180,155 @@ The first key is the initial key k and the next keys are the same as the previou
 	7 & 19\\
 	8 & 3	
 	\end{bmatrix}$.
-	
 \end{exercise}
+
+\chapter*{Lecture 5}
+
+\begin{definition}
+	A \textbf{perfect cipher} is a cipher that can never be broken, even after an unlimited time.
+\end{definition}
+But do perfect ciphers exist? Yes, but they are only theoretically (they can be implemented), in practice they are unpractical.
+
+The theory behind perfect ciphers has been developed by \textbf{Claude Shannon}. It assumes an only-ciphertext model of the attacker, this means that the attacker only knows the ciphertext y and tries to find the plaintext x or the key k.
+
+We can provide another definition for perfect ciphers:
+\begin{definition}
+	A cipher system is said to offer \textbf{perfect secrecy} if, on seeing the ciphertext, the interceptor gets no extra information about the plaintext than he had before the ciphertext was observed. In a cipher system with perfect secrecy, the interceptor is forced to guess the plaintext.
+\end{definition}
+
+To formalize them we need to introduce a bit of probability:
+\begin{itemize}
+	\item p$_p$(x) is the probability of plaintext x to occur;
+	\item p$_K$(k) is the probability of certain key k to be used as encryption key.
+\end{itemize}
+Given a plaintext and a key there exists a unique corresponding ciphertext.
+
+The two probability distributions p$_p$(x) and p$_K$(k) induce a probability distribution on the ciphertexts.
+\setcounter{equation}{0}
+\begin{equation}
+	p_c(y) = \sum_{k \in K, \exists x |E_k(x)=y}^{} p_K(k)\times p_p(D_k(y))
+\end{equation}
+
+This means that, given a ciphertext y, we look for all the keys that can give such a ciphertext from some plaintext x. Then we sum the probability of all such keys times the probability of the corresponding plaintext.
+\begin{example}
+	Let's consider the following toy-cipher with P={a,b}, K={k$_1$,k$_2$}, C{1,2,3}. The encryption is defined in the following table:
+
+	\begin{table}[h!]
+		\centering
+		\begin{tabular}{|c | c c|} 
+			\hline
+			\textbf{E} & \textbf{a} & \textbf{b} \\ 
+			\hline
+			\textbf{k$_1$} & 1 & 2 \\ 
+			\textbf{k$_2$} & 2 & 3 \\ 
+			\hline
+		\end{tabular}
+		\label{tab:exmpPerfciph}
+	\end{table}
+
+	Let p$_p$(a)=3/4, p$_p$(b)=1/4, p$_K$(k$_1$)=p$_K$(k$_2$)=1/2.
+	
+	Now we want to compute p$_C$(1), p$_C$(2), p$_C$(3).
+	
+	p$_C$(1) = p$_p$(a) $\times$ p$_{K}$(k$_1$) = 3/4 $\times$ 1/2 = 3/8\\
+	p$_C$(2) = p$_p$(a) $\times$ p$_{K}$(k$_2$) + p$_p$(b) $\times$ p$_{K}$(k$_1$) = 3/4 $\times$ 1/2 + 1/4 $\times$ 1/2 = 3/8 + 1/8 = 1/2\\ 
+	p$_C$(3) = p$_p$(b) $\times$ p$_{K}$(k$_2$) = 1/4 $\times$ 1/2 = 1/8\\
+\end{example}
+
+\begin{definition}
+	The \textbf{conditional probability of a ciphertext} y with respect to a plaintext x, computes how likely is a certain y once we fix x.
+	\setcounter{equation}{0}
+	\begin{equation}
+		p_c(y|x) = \sum_{k\in K, E_K(x)=y}^{} p_K(x)
+	\end{equation}
+	More simply is just the sum of the probability of all keys giving y from x.
+\end{definition}
+
+\begin{example}
+	The conditional probability of ciphertext 1 with respect to the two plaintexts a and b is:
+	
+	\setcounter{equation}{0}
+	\begin{align}
+		p_c(1|a) &= \sum_{k\in K, E_K(x)=y}^{} p_K(x) = p_K(k_1) = 1/2 \\
+		p_c(1|b) &= \sum_{k\in K, E_K(x)=y}^{} p_K(x) = 0		
+	\end{align}
+	We can notice that 1 can never be obtained from b. Furthermore we can see that if an attacker sees a 1, he can deduce that it is an a, this means that this is not a perfect cipher.
+\end{example}
+
+The conditional probability of a plaintext with respect to a ciphertext is related to the security of the cipher. It is a measure of how likely is a plaintext once a ciphertext is observed (which is what the attacker is usually interested to know).
+
+With Pr(y)>0, we can define the \textbf{Bayes' Theorem} as:
+\setcounter{equation}{0}
+\begin{equation}
+	Pr(x|y) = \frac{Pr(x) \times Pr(y|x)}{Pr(y)}
+\end{equation}
+
+We can apply this theorem to our case to get the conditional probability of a plaintext x with respect to a ciphertext y:
+\setcounter{equation}{0}
+\begin{equation}
+	p_p(x|y) = \frac{p_p(x) \times p_c(y|x)}{p_c(y)}
+\end{equation}
+
+\begin{example}
+	At this point we can compute p$_p$(a|1) and p$_p$(b|1) as follows:
+	\setcounter{equation}{0}
+	\begin{align}
+	p_p(a|1) &= \frac{p_p(a) \times p_c(1|a)}{p_c(1)} = \frac{3/4 \times 1/2}{3/8} = 1\\
+	p_p(b|1) &= \frac{p_p(b) \times p_c(1|b)}{p_c(1)} = \frac{1/4 \times 0}{3/8} = 0
+	\end{align}
+\end{example}
+Thus, when observing a 1 as a result of a conditional probability of a plaintext x with respect to a ciphertext y, we are sure it is plaintext x, and this means that the cipher is completely insecure.
+
+\begin{exercise}
+	What will be the probabilities of plaintexts a and b with respect to ciphertext 3?
+	
+	First of all we need to find the conditional probabilities of ciphertext 3 with respect to the plaintexts a and b:
+	
+	\setcounter{equation}{0}
+	\begin{align}
+		p_c(3|a) &= \sum_{k\in K, E_K(x)=y}^{} p_K(x) = 0 \\
+		p_c(3|b) &= \sum_{k\in K, E_K(x)=y}^{} p_K(x) = p_K(k_2) = 1/2		
+	\end{align}
+	
+	We can now compute the conditional probabilities of plaintexts a and b with respect to the ciphertext 3:
+	
+	\setcounter{equation}{0}
+	\begin{align}
+		p_p(a|3) &= \frac{p_p(a) \times p_c(3|a)}{p_c(3)} = \frac{3/4 \times 0}{1/8} = 0\\
+		p_p(b|3) &= \frac{p_p(b) \times p_c(3|b)}{p_c(3)} = \frac{1/4 \times 1/2}{1/8} =  1
+	\end{align}
+\end{exercise}
+
+\begin{exercise}
+	What if we compute the probabilities of a and b when observing 2?
+	
+	First of all we need to find the conditional probabilities of ciphertext 2 with respect to the plaintexts a and b:
+	
+	\setcounter{equation}{0}
+	\begin{align}
+	p_c(2|a) &= \sum_{k\in K, E_K(x)=y}^{} p_K(x) = p_K(k_1) = 1/2 \\
+	p_c(2|b) &= \sum_{k\in K, E_K(x)=y}^{} p_K(x) = p_K(k_2) = 1/2		
+	\end{align}
+	
+	We can now compute the conditional probabilities of plaintexts a and b with respect to the ciphertext 2:
+	
+	\setcounter{equation}{0}
+	\begin{align}
+	p_p(a|2) &= \frac{p_p(a) \times p_c(2|a)}{p_c(2)} = \frac{3/4 \times 1/2}{1/2} = 3/4\\
+	p_p(b|2) &= \frac{p_p(b) \times p_c(2|b)}{p_c(2)} = \frac{1/4 \times 1/2}{1/2} =  1/4
+	\end{align}
+\end{exercise}
+
+At this point we can provide an extra definition for perfect ciphers:
+\begin{definition}
+	A cipher is perfect iff p$_p$(x|y)=p$_p$(x) for all x in P and for all y in C.
+\end{definition}
+
+Intuitively, a cipher is perfect if observing a ciphertext y gives no information about any of the possible plaintexts x.
+
+The cipher in the example is far from being perfect, but it satisfies the above definition for ciphertext 2.
+
+A cipher is perfect if there is some key that maps any message to any ciphertext with equal probability.
 \end{document}
 
 
