@@ -90,6 +90,7 @@
 \newtheorem{property}{\textbf{Property}}
 \newtheorem{example}{\textbf{Example}}
 \newtheorem{exercise}{\textbf{Exercise}}
+\newtheorem{theorem}{\textbf{Theorem}}
 
 \begin{document}
     \maketitle
@@ -1320,7 +1321,7 @@ Thus, when observing a 1 as a result of a conditional probability of a plaintext
 \end{exercise}
 
 At this point we can provide an extra definition for perfect ciphers:
-\begin{definition}
+\begin{definition}\label{defperfcipher}
 	A cipher is perfect iff p$_p$(x|y)=p$_p$(x) for all x in P and for all y in C.
 \end{definition}
 
@@ -1329,6 +1330,119 @@ Intuitively, a cipher is perfect if observing a ciphertext y gives no informatio
 The cipher in the example is far from being perfect, but it satisfies the above definition for ciphertext 2.
 
 A cipher is perfect if there is some key that maps any message to any ciphertext with equal probability.
+
+\chapter*{Lecture 6}
+To prove that a cipher is not perfect, we just need to find a x in P and a y in C that does not satisfy definition \ref{defperfcipher}
+
+\begin{exercise}
+	Prove that the shift cipher with p$_K$(k) = 1/|K| = 1/26 (i.e., with keys picked at random for each letter of the plaintext), is a perfect cipher. If we change key at any time we encrypt a letter, the shift cipher becomes perfect (unbreakable).
+	
+	We can define the cipher as follows:
+	\begin{itemize}
+		\item P=C=K=Z$_{26}$;
+		\item E$_k$(x) = (x+k) mod26;
+		\item D$_k$(y) = (y-k) mod26;
+		\item k changes at each encryption.
+	\end{itemize}
+	We want to prove that definition \ref{defperfcipher} holds for this cipher.
+	
+	We compute the probability of a generic ciphertext y as:
+	\setcounter{equation}{0}
+	\begin{align}
+	p_C(y) &= \sum_{k\in K, \exists x.E_k(x)=y}^{}p_K(k)\times p_p(D_k(y))\\
+	&= \frac{1}{26} \sum_{k\in K, \exists x.E_k(x)=y}^{} p_p(D_k(y))\\
+	&= \frac{1}{26}\sum_{k\in K}^{}p_p((y-k) mod26)\\
+	&= \frac{1}{26}\sum_{x \in P}^{} p_p(x) = \frac{1}{26}
+	\end{align}
+	
+	Note that for each key k, we always have the plaintext (y-k) mod26 that gives y when encrypted under k, and that for all possible keys gives all possible plaintexts x and sums to 1.
+	
+	\setcounter{equation}{0}
+	\begin{align}
+	p_c(y|x) &= \sum_{k\in K, E_k(x)=y}^{}p_K(k)\\
+	&= p_K((y-x) mod26) =\frac{1}{26}
+	\end{align}
+	We get that k = (y-x) mod26 from the decryption formula, given x and y, there exists a unique key k that encrypts x as y and it is (y-x)mod26.
+	
+	Finally we can say that:
+	\setcounter{equation}{0}
+	\begin{align}
+	p_p(x|y) &= \frac{p_p(x)\times p_c(y|x)}{p_c(y)}\\
+	&= \frac{p_p(x)\times \frac{1}{26}}{\frac{1}{26}} = p_p(x)
+	\end{align}
+	We have demonstrated that $p_p(y|x) = p_p(x)$ for all x in P and for all y in C, thus the cipher is perfect.
+\end{exercise}
+
+\begin{theorem}\label{theoKP}
+	Let $p_c(y)>0$ for all y. A cipher is perfect only if |K|$\ge$|P|.
+\end{theorem}
+
+This means that a necessary condition for a cipher to be perfect is that the number of keys is at least the same as the number of plaintexts.
+\begin{proof}
+	For Bayes' theorem:
+		\[p_p(x|y) = \frac{p_p(x)\times p_c(y|x)}{p_c(y)}\]
+	Thus, given $p_p(x|y) = p_p(x)$ (the cipher is perfect), we have $p_c(y|x) = p_c(y)$ (these two quantities erase) for all x in P and for all y in C.
+	
+	As an assumption $p_c(y)>0$.\\
+	If we fix x, we obtain that for each y, $p_c(y|x) = p_c(y)>0$. This means that there exists at least one key k such that E$_k$(x)=y (otherwise $p_c(y|x)=0$).
+	
+	All such keys are different since E$_k$ is a function and we have fixed x, and x cannot be mapped to two different ciphertexts by the same key. Thus, we have at least one key for each ciphertext (|K|$\ge$|C|).
+	
+	Since, for any cipher (not necessarily perfect), E$_k$ injects the set of plaintexts into the set of ciphertext, we also have |C|$\ge$|P|, thus |K|$\ge$|C|$\ge$|P|, i.e.,
+	\begin{center}
+		\textbf{|K|$\ge$|P|}
+	\end{center}
+\end{proof}
+
+\begin{exercise}
+	Prove that the ciphertext defined as E$_k$(x$_1$,...,x$_d$)=(x$_1$+k,...,x$_d$+k)mod26 is not perfect.
+	
+	We can prove this in two ways:
+	\begin{enumerate}
+		\item using the theorem \ref{theoKP}, proving that |K|<|P|.\\
+		Our set K=\{0, 1, 2, .., 25\}, so |K|=26, we need to find |P|. Since x=\{x$_1$,..,x$_d$\} and each x$_i$ can assume 26 values, we have that |P|=26$^d$. Thus 26<26$^d$, so |K|<|P| (with d$\ge$2). 
+		\item using definition \ref{defperfcipher}. Let's assume x=\{x$_1$,..,x$_d$\} is an English word and let's also assume d=5. We are looking for an English word of length 5, for example \textit{GOOFY}. Since it is a real word, $p_p$(GOOFY)>0. We want to find a y such that $p_p$(GOOFY|y)$\ne p_p$(GOOFY)>0. For example with y=AAAAA, $p_p$(GOOFY|AAAAA)=0 and we are done. We could have used other y, such as y=ABCDE.
+	\end{enumerate}
+\end{exercise}
+
+\begin{theorem}\label{theoperfcipher}
+	Let |P|=|C|=|K|. A cipher is perfect iff
+	\begin{enumerate}
+		\item $p_K(k)=1/|K|$ for all k in K;
+		\item for each x in P and y in C, there exists exactly one key k such that E$_k$(x)=y.
+	\end{enumerate}
+\end{theorem}
+The theorem states that, for a cipher to be perfect (given that the size of P, C and K is the same), keys should be picked at random for any encryption and each plaintext is mapped into each ciphertext through a unique key.
+
+\begin{proof}
+	We will prove the $\rightarrow$ direction of the theorem.
+	
+	For theorem \ref{theoKP}, in a perfect cipher |K|$\ge$|C| if $p_c$(y)>0 for all y. If we fix x, we obtain that for each y $p_c$(y|x)=$p_c$(y)>0, i.e., there exists at least one key k such that E$_k$(x)=y and all of the other keys are different.
+	
+	Here (by assumption) |K|=|C|, meaning that all of these keys k are unique (otherwise we would have |K|>|C|). Since this holds for each x and y, we have proved condition 2, i.e., that for each x in P and y in C, there exists exactly one key k such that E$_k$(x)=y.
+	
+	To prove condition 1, it is enough to notice that given
+	\[p_c(y|x) = \sum_{k\in K,E_k(x)=y}^{}p_K(k)\]
+	$p_c$(y|x)=$p_p$(y), i.e., the probability of y given x is equal to the probability of the unique key k that encrypts x into y.
+	
+	Thus, $p_K$(k)=$p_c$(y|x)=$p_c$(y).\\
+	If we fix y and we consider all possible plaintexts x we obtain all possible keys k and for all of them it holds $p_K$(k)=$p_c$(y). Since the number of keys is |K|, and since they all have the same probability ($p_c$(y)), and given that the sum of the probabilities of all keys must be 1 and |P|=|C|=|K|, we obtain condition 1, $p_K$(k)=1/|K|.\\
+\end{proof}
+
+We can use this theorem to prove that a cipher is (or is not) perfect.
+\subsubsection{The one time pad}
+This perfect cipher has been used for the telegraph and is a binary variant of Vigenére with keys picked at random.
+
+More precisely we have P=C=K=Z$_{2^d}$ with $p_K$(k)=1/|K|=1/2$^d$ for all k in K. 2$^d$ means sequences of binary numbers of length d.
+
+The encryption function is the following: E$_{k_1,...,k_d}$(x$_1$,...,x$_d$) = (x$_1$ xor k$_1$,...,x$_d$ xor k$_d$), where xor is a bitwise xor operation.
+
+Is it a perfect cipher? Condition 2 of theorem \ref{theoperfcipher} is satisfied by definition. Condition 2 holds too because we are using xor operations.
+
+\subsubsection{Lesson learned}
+Shannon theory on perfect ciphers shows that they exist but require as many keys as the possible plaintexts, and keys need to be picked at random for each encryption.
+
+Even if this makes such ciphers unpractical, the one-time-pad has been used for real transmission. The setup consisted of two identical books with thousands of "random" keys. Each key was used only once. Once the book has been used completely, new shared books were necessary.
 \end{document}
 
 
