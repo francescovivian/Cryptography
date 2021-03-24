@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  23 MAR 2021 22:37
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  24 MAR 2021 18:24
 entering extended mode
 **./main.tex
 (main.tex
@@ -2279,14 +2279,47 @@ OOFY)>0. We want to find a y such that $\OML/cmm/m/it/12 p[]$\T1/cmr/m/n/12 (GO
 OFY|y)$\OMS/cmsy/m/n/12 6\OT1/cmr/m/n/12 =
  []
 
-[30] [31] 
+[30] [31] [32] [33
+
+] [34] [35]pdfTeX warning (ext4): destination with the same identifier (name{eq
+uation.0.0.1}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.1598 	\end{align}
+                   pdfTeX warning (ext4): destination with the same identifier 
+(name{equation.0.0.2}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.1598 	\end{align}
+                   pdfTeX warning (ext4): destination with the same identifier 
+(name{equation.0.0.3}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.1598 	\end{align}
+                   pdfTeX warning (ext4): destination with the same identifier 
+(name{equation.0.0.4}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.1598 	\end{align}
+                   pdfTeX warning (ext4): destination with the same identifier 
+(name{equation.0.0.5}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.1598 	\end{align}
+                    [36]
+Overfull \hbox (4.0252pt too wide) in paragraph at lines 1635--1636
+[]\T1/cmr/m/n/12 Now we need to di-vide x$[]$+x$[]$+x$[]$+x$[]$+x$[]$+x by the 
+ir-re-ducible poly-no-mial x$[]$+x$[]$+x$[]$+x+1
+ []
+
+
 AED: lastpage setting LastPage
-[32]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1446.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1446.
+[37]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1651.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1651.
  (main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1446.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1446.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1651.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1651.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
@@ -2299,11 +2332,11 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 35983 strings out of 480893
- 684593 string characters out of 2898027
- 1406258 words of memory out of 3000000
- 50941 multiletter control sequences out of 15000+200000
- 554318 words of font info for 80 fonts, out of 3000000 for 9000
+ 36016 strings out of 480893
+ 685048 string characters out of 2898027
+ 1406328 words of memory out of 3000000
+ 50944 multiletter control sequences out of 15000+200000
+ 555095 words of font info for 81 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  81i,12n,96p,827b,1668s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/cm-super/cm
@@ -2327,21 +2360,22 @@ X 2.9/fonts/type1/public/amsfonts/symbols/msam10.pfb><C:/Users/vivia/AppData/Lo
 cal/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfbi1200.pfb><C:/Users/vivi
 a/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfbx1200.pfb><C
 :/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfb
-x2488.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/
-cm-super/sfcc1440.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/t
-ype1/public/cm-super/sfcc1728.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX
- 2.9/fonts/type1/public/cm-super/sfcc2074.pfb><C:/Users/vivia/AppData/Local/Pro
-grams/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm0800.pfb><C:/Users/vivia/AppDa
-ta/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1000.pfb><C:/Users
-/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1200.p
+x1728.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/
+cm-super/sfbx2488.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/t
+ype1/public/cm-super/sfcc1440.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX
+ 2.9/fonts/type1/public/cm-super/sfcc1728.pfb><C:/Users/vivia/AppData/Local/Pro
+grams/MiKTeX 2.9/fonts/type1/public/cm-super/sfcc2074.pfb><C:/Users/vivia/AppDa
+ta/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm0800.pfb><C:/Users
+/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm1000.p
 fb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-supe
-r/sfrm1440.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pu
-blic/cm-super/sfrm1728.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fo
-nts/type1/public/cm-super/sfti1200.pfb><C:/Users/vivia/AppData/Local/Programs/M
-iKTeX 2.9/fonts/type1/public/cm-super/sfti1440.pfb>
-Output written on main.pdf (33 pages, 1073703 bytes).
+r/sfrm1200.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pu
+blic/cm-super/sfrm1440.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fo
+nts/type1/public/cm-super/sfrm1728.pfb><C:/Users/vivia/AppData/Local/Programs/M
+iKTeX 2.9/fonts/type1/public/cm-super/sfti1200.pfb><C:/Users/vivia/AppData/Loca
+l/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfti1440.pfb>
+Output written on main.pdf (38 pages, 1111472 bytes).
 PDF statistics:
- 551 PDF objects out of 1000 (max. 8388607)
- 222 named destinations out of 1000 (max. 500000)
+ 611 PDF objects out of 1000 (max. 8388607)
+ 251 named destinations out of 1000 (max. 500000)
  83 words of extra memory for PDF output out of 10000 (max. 10000000)
 

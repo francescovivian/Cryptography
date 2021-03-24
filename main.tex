@@ -484,8 +484,8 @@ A substitution cipher is a generalization to overcome the previous limitation: i
 "\texttt{HOME}" becomes "\texttt{CPYM}". In this case the key is the complete permutation, otherwise the receiver is not able to decrypt our message. As for the previous ciphers, to decrypt we just apply the inverse substitution.\\
 We have P=C=$\textrm{Z}_{26}$ and K=\{p|p is a permutation of 0,..,25\} with:
 \begin{itemize}
-	\item $\textrm{E}_k$(x)=p(x);
-	\item $\textrm{D}_k$(y)=$\textrm{p}^{-1}$(y).
+	\item $\textrm{E}_k$(x)=$\rho$(x);
+	\item $\textrm{D}_k$(y)=$\rho^{-1}$(y).
 \end{itemize}
 
 Can we "Brute force" also this type of ciphers? No, we would have to try 26! keys, which is approximately $4\times10^{26}>2^{88}$. This number of keys is very heavy to brute force, even with powerful parallel computers. We have to find something different to attack substitution ciphers. How can we do it?\\
@@ -586,8 +586,8 @@ We have seen that we can easily break monoalphabetic ciphers applying this metho
 	\setcounter{equation}{0}
 	\begin{align}
 		x &= D_k(E_k(x)) \\
-		&=D_k(p(x)) \\
-		&=p^{-1}(p(x)) \\
+		&=D_k(\rho(x)) \\
+		&=\rho^{-1}(\rho(x)) \\
 		&=x\\
 	\end{align}
 \end{proof}
@@ -1443,6 +1443,211 @@ Is it a perfect cipher? Condition 2 of theorem \ref{theoperfcipher} is satisfied
 Shannon theory on perfect ciphers shows that they exist but require as many keys as the possible plaintexts, and keys need to be picked at random for each encryption.
 
 Even if this makes such ciphers unpractical, the one-time-pad has been used for real transmission. The setup consisted of two identical books with thousands of "random" keys. Each key was used only once. Once the book has been used completely, new shared books were necessary.
+
+\chapter*{Lecture 7}
+\begin{exercise}
+	Consider the following cipher with P=\{a,b\}, K=\{k$_1$,k$_2$,k$_3$\}, C=\{1,2,3,4\}. Encryption is defined by the following table:
+		\begin{table}[H]
+		\centering
+		\begin{tabular}{|c | c c|} 
+			\hline
+			 & \textbf{a} & \textbf{b} \\ 
+			\hline
+			\textbf{k$_1$} & 1 & 2 \\ 
+			\textbf{k$_2$} & 2 & 3 \\ 
+			\textbf{k$_3$} & 3 & 4 \\ 
+			\hline
+		\end{tabular}
+		\label{tab:exerciselec7}
+	\end{table}
+	We now let $p_p$(a)=1/4, $p_p$(b)=3/4, $p_K$(k$_1$)=1/2, $p_K$(k$_2$) = $p_K$(k$_3$)=1/4.\\
+	Compute $p_p$(a|1), $p_p$(a|2), $p_p$(a|3), $p_p$(a|4), $p_p$(b|1), $p_p$(b|2), $p_p$(b|3), $p_p$(b|4).
+	
+	First of all let's compute all the $p_c$ for 1,2,3,4:
+	\[p_c(1) = p_p(a)\times p_K(k_1) = 1/4\times 1/2 = 1/8\]
+	\[p_c(2) = p_p(b)\times p_K(k_1)  + p_p(a)\times p_K(k_2)= 3/4\times 1/2 + 1/4\times 1/4 = 7/16\]
+	\[p_c(3) = p_p(b)\times p_K(k_2)  + p_p(a)\times p_K(k_3)= 3/4\times 1/4 + 1/4\times 1/4 = 1/4\]
+	\[p_c(4) = p_p(b)\times p_K(k_3) = 3/4\times 1/4 = 3/16\]
+	
+	Then we can compute
+	\[p_c(1|a) = p_K(k_1) = 1/2\]
+	\[p_c(2|a) = p_K(k_2) = 1/4\]
+	\[p_c(3|a) = p_K(k_3) = 1/4\]
+	\[p_c(4|a) = 0\]
+	
+	\[p_c(1|b) = 0\]
+	\[p_c(2|b) = p_K(k_1) = 1/2\]
+	\[p_c(3|b) = p_K(k_2) = 1/4\]
+	\[p_c(4|b) = p_K(k_3) = 1/4\]
+	
+	Finally:
+	\[p_p(a|1) = \frac{p_c(1|a)\times p_p(a)}{p_c(1)} = \frac{1/2\times 1/4}{1/8}= 1\]
+	\[p_p(a|2) = \frac{p_c(2|a)\times p_p(a)}{p_c(2)} = \frac{1/4\times 1/4}{7/16}= 1/7\]
+	\[p_p(a|3) = \frac{p_c(3|a)\times p_p(a)}{p_c(3)} = \frac{1/4\times 1/4}{1/4}= 1/4\]
+	\[p_p(a|4) = \frac{p_c(4|a)\times p_p(a)}{p_c(4)} = \frac{0\times 1/4}{3/16}= 0\]
+	
+	\[p_p(b|1) = \frac{p_c(1|b)\times p_p(b)}{p_c(1)} = \frac{0\times 3/4}{1/8}= 0\]
+	\[p_p(b|2) = \frac{p_c(2|b)\times p_p(b)}{p_c(2)} = \frac{1/2\times 3/4}{7/16}= 6/7\]
+	\[p_p(b|3) = \frac{p_c(3|b)\times p_p(b)}{p_c(3)} = \frac{1/4\times 3/4}{1/4}= 3/4\]
+	\[p_p(b|4) = \frac{p_c(4|b)\times p_p(b)}{p_c(4)} = \frac{1/4\times 3/4}{3/16}= 1\]
+	
+\end{exercise}
+
+\subsubsection{Composition of ciphers}
+A one-time-pad provides absolute security in theory, but difficult to implement in practice. Modern ciphers are based on very simple operations, such as substitution, xor, etc., that are combined in a smart way so to make the overall algorithm strong and really hard to cryptoanalyse.
+
+Combining simple ciphers does not always improve security. Let's consider the shift cipher composed twice: we first shift by k$_1$ and then by k$_2$ modulo 26. But this is equivalent to shift by k$_1$+k$_2$ modulo 26.
+
+\begin{example}
+	Shift of 3 and then of 2:
+	\begin{center}
+		\texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ}\\
+		\texttt{DEFGHIJKLMNOPQRSTUVWXYZABC}\\
+		\texttt{FGHIJKLMNOPQRSTUVWXYZABCDE}\\
+	\end{center}
+	
+	but this is equivalent to a shift of 5:
+	\begin{center}
+		\texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ}\\
+		\texttt{FGHIJKLMNOPQRSTUVWXYZABCDE}\\
+	\end{center}
+\end{example}
+
+\begin{definition}
+	\textbf{Composition:} we consider two ciphers S$^1$=(P$^1$, C$^1$, K$_1$, E$^1$, D$^1$) and S$^2$=(P$^2$, C$^2$, K$_2$, E$^2$, D$^2$).
+	
+	We let P$^1$=C$^1$=P$^2$=C$^2$, that we note as P and C in the following. In this way, the output of one cipher is for sure a possible plaintext for the second cipher.
+	
+	We can now define the composition as S$^1\times$S$^2$=(P, C, K$_1\times$K$_2$, E, D) with:
+	\begin{itemize}
+		\item E$_{k_1,k_2}$(x) = E$^2_{k_2}$(E$^1_{k_1}$(x));
+		\item D$_{k_1,k_2}$(y) = D$^1_{k_1}$(D$^2_{k_2}$(y));
+	\end{itemize}
+\end{definition}
+
+\begin{exercise}
+	Formally apply the composition of the two shift ciphers previously mentioned.
+	
+	Formally we have E$_k^1$(x)=E$_k^2$(x)=(x+k)mod26\\
+	and\\
+	E$_{(k_1,k_2)}$(x) = E$_{k_2}^2$(E$_{k_1}^1$(x)) = ((x+k$_1$) mod26+k$_2$) mod26 = (x+(k$_1$+k$_2$)mod26)mod26 = E$_{k_1+k_2mod26}^1$(x)
+	
+	This proves that composing the shift cipher twice is equivalent to applying it once using as a key the sum of the two keys k$_1$ and k$_2$.
+\end{exercise}
+
+\begin{exercise}
+	Show that the composition of the shift cipher with the substitution cipher is still a substitution cipher with a different key. Give a constructive way to derive the new key. What happens if substitution is applied before shift? 
+	
+	Let's consider an example of substitution:
+	\begin{center}
+		\texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ}\\
+		\texttt{VCFIORBMPLYUQXJHNDWSKETZAG}
+	\end{center}
+	If we shift of 5 (for example) and then we substitute it becomes:
+		\begin{center}
+		\texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ}\\
+		\texttt{RBMPLYUQXJHNDWSKETZAGVCFIO}
+	\end{center}
+	This is nothing more then a substitution cipher with a different key. To decrypt we need to apply first the substitution and then the shift back.
+	
+	If we do the opposite, so first we substitute and then we shift we would have something similar to the following example:
+		\begin{center}
+		\texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ}\\
+		\texttt{VCFIORBMPLYUQXJHNDWSKETZAG}\\
+		\texttt{AHKNTWGRUQDZVCOMSIBXPJYEFL}
+	\end{center}
+	Once again it corresponds to a substitution cipher with a different key. Of course to decrypt we would have first to shift back and then substitute.
+\end{exercise}
+
+\begin{exercise}
+	Consider the composition of a Vigenére cipher with key \texttt{ALICE} with the shift cipher with key 8. Is the resulting cipher equivalent to a known one? If so, what is the resulting key?
+	
+	The Vigenère cipher with key \texttt{ALICE} encryption can be represented as:
+	\begin{center}
+		E$_{k_1,...,k_m}$(x$_1$,...,x$_m$) = (x$_1$+0, x$_2$+11, x$_3$+8, x$_4$+2, x$_5$+4, ..) mod26
+	\end{center}
+	
+	A shift cipher with key 8 can be represented as:
+	\begin{center}
+		\texttt{ABCDEFGHIJKLMNOPQRSTUVWXYZ}\\
+		\texttt{IJKLMNOPQRSTUVWXYZABCDEFGH}
+	\end{center}
+
+	Then the composition is:
+	E$_{k_1,k_2}$(x) = (x$_1$+0+8, x$_2$+11+8, x$_3$+8+8, x$_4$+2+8, x$_5$+4+8, ..) mod26 = (x$_1$+8, x$_2$+19, x$_3$+16, x$_4$+10, x$_5$+12, ..) mod26
+	
+	This is nothing more then a Vigenére cipher with key \texttt{ITQKM}
+\end{exercise}
+
+\subsubsection{Idempotent ciphers}
+We have seen that the shift cipher, when repeated twice is equivalent to itself with a different key. When this happens, the cipher is said to be \textbf{idempotent}, written S$\times$S=S. In this case we know that iterating the cipher will be of no use to improve its security, even if we repeat it n times, we will still get the initial cipher, i.e., S$^n$=S.
+
+We have mentioned that modern ciphers are based on simple operations composed together. Almost any modern cipher repeats a basic core of operations for a certain number of rounds (iteration). It is thus necessary that such core operations do not constitute an idempotent cipher.
+
+It can be proved that if we have two idempotent ciphers that commute, i.e., such that S$^1\times$S$^2$=S$^2\times$S$^1$, then their composition is also idempotent. In this case we know that iterating their composition is useless.
+
+\begin{proof}
+	Consider one iteration of their composition
+	\setcounter{equation}{0}
+	\begin{align}
+		&(S^1\times S^2)\times(S^1\times S^2)\\
+		&=S^1\times (S^2\times S^1)\times S^2 &\text{associative property}\\
+		&=S^1\times (S^1\times S^2)\times S^2 &\text{commutative property}\\
+		&=(S^1\times S^1)\times (S^2\times S^2) &\text{associative property}\\
+		&=S^1\times S^2 &\text{idempotence of the initial ciphers}
+	\end{align}
+\end{proof} 
+
+\begin{exercise}
+	Apply the above result to show that the composition of Vigenére cipher S$^1$ and the shift cipher S$^2$ is idempotent.
+	
+	The composition is a Vigenére cipher S$^3$ with key k$_1$+k$_2$ mod26, ..., k$_d$+k$_2$ mod26, S$^1\times$S$^2$=S$^3$.
+	
+	Thus (S$^1\times$S$^2$)$\times$(S$^1\times$S$^2)$ = S$^3\times$S$^3$=S$^3$ which is again a Vigenére cipher with a new key. This holds iterating many times. 
+\end{exercise}
+
+We have seen examples of how algebraic properties, such as commutativity, can help simplifying the analysis of a cipher. When developing a robust cipher, we need to avoid as much as possible that operations can be rearranged, swapped, simplified.
+
+\section*{The Advanced Encryption Standard (AES) cipher}
+AES has been selected by the National Institute of Standards and Technology (NIST) after a five-year long competition. The original name is Rijndael from the names of the two inventors, Joan Daemen and Vincent Rijmen.
+
+As any modern cipher, AES is the composition of simple operations and contains a non-linear component to avoid known-plaintexts attacks. The composed operation give a non-idempotent cipher that is iterated for a fixed number of rounds.
+\newpage
+It has been selected since it provides:
+\begin{itemize}
+	\item high security guarantees;
+	\item high performance;
+	\item flexibility (different key length)
+\end{itemize}
+All of these features are, in fact, crucial for any modern cipher.
+
+The Data Encryption Standard (DES) is still in use after almost 40 years, in a variant called Triple DES (3DES), which aims at improving the key length (168 bits). In fact, DES key of only 56 bits(64-8 control bits) is too short to resist brute-forcing on modern, parallel computers.
+
+\subsubsection{Mathematical background of AES}
+AES works on the Galois Field with 2$^8$ elements, noted GF(2$^8$). Intuitively it is the set of all 8-bits digits with sum and multiplication performed by interpreting the bits as (binary) coefficients of polynomials. For example 11010011 can be seen as x$^7$+x$^6$+x$^4$+x+1 and 00111010 is x$^5$+x$^4$+x$^3$+x.
+
+The sum of x$^7$+x$^6$+x$^4$+x+1 and x$^5$+x$^4$+x$^3$+x will thus be x$^7$+x$^6$+x$^5$+x$^3$+1 since two 1's coefficient becomes 0 modulo 2=0, and the term disappears. We see that sum and subtraction are just the bit-wise XOR of the binary numbers, 11010011 XOR 00111010 = 11101001 which is x$^7$+x$^6$+x$^5$+x$^3$+1.
+
+The product is done modulo the irreducible polynomial x$^8$+x$^4$+x$^3$+x+1, irreducible means that it cannot be written as the product of two other polynomials, it is, intuitively, the equivalent of primality.
+\begin{example}
+	(x$^7$+x$^6$+x$^4$+x+1)$\times$ (x$^5$+x$^4$+x$^3$+x) = x$^{12}$ + x$^{11}$ + x$^{10}$ + x$^8$ + x$^{11}$ + x$^{10}$ + x$^9$ + x$^7$ + x$^9$ + x$^8$ + x$^7$ + x$^5$ + x$^6$ + x$^5$ + x$^4$ + x$^2$ + x$^5$ + x$^4$ + x$^3$ + x = x$^{12}$ + x$^6$ + x$^5$ + x$^3$ + x$^2$ + x
+	
+	Now we need to divide x$^{12}$+x$^6$+x$^5$+x$^3$+x$^2$+x by the irreducible polynomial x$^8$+x$^4$+x$^3$+x+1 and find the reminder. x$^{12}$/x$^8$=x$^4$, thus (x$^8$+x$^4$+x$^3$+x+1)*x$^4$ = x$^{12}$+x$^8$+x$^7$+x$^5$+x$^4$.
+	
+	At this point we need to subtract this polynomial (to get the remainder), we obtain x$^8$ + x$^7$ + x$^6$ + x$^4$ + x$^3$ + x$^2$ + x and we repeat the process obtain the final remainder: x$^7$ + x$^6$ + x$^2$ + 1.  
+\end{example}
+
+\begin{exercise}
+	Multiply (x$^4$+x$^3$+1)$\times$(x$^5$+1)
+	
+	= x$^9$+x$^4$+x$^8$+x$^3$+x$^5$+1 = x$^9$+x$^8$+x$^5$+x$^4$+x$^3$+1
+	
+	We divide it by the irreducible polynomial: x$^9$/x$^8$ = x, thus (x$^8$+x$^4$+x$^3$+x+1)*x = x$^{9}$+x$^5$+x$^4$+x$^2$+x.
+	
+	We subtract this polynomial from the result of the multiplication to obtain the reminder: x$^8$+x$^3$+x$^2$+x+1.
+	
+	We repeat the process and we obtain the final reminder x$^4$+x$^2$.
+\end{exercise}
 \end{document}
 
 
