@@ -1906,8 +1906,327 @@ This is exactly the sam as the one for encryption, but with the inverse function
 			\hline
 		\end{tabular}
 	\end{table}
+	In two steps we had a number longer than 8 bits, so we had to xor it with the irreducible polynomial.
 \end{exercise}
 
+\chapter*{Lecture 9}
+As we said on the previous lecture, the security of AES also depends on the number of rounds: by 2006 the best known attack were on 7 rounds for 128-bits keys, 8 round for 192-bits keys and 9 rounds for 256-bits keys.
+
+\section*{Block cipher modes}
+When using block ciphers we have to face the problem of encrypting plaintexts that are longer than the block size. We then adopt a mode of operation, i.e., a scheme that repeatedly applies the block cipher and allows for encrypting a plaintext of arbitrary size. This can be apply to any block cipher (AES, etc.), so encryption and decryption will depend on the chosen one.
+
+
+\subsubsection{Electronic CodeBlock mode (ECB)}
+This is the simplest mode, it is what we have done so fare with classic ciphers: the plaintext X is split into blocks x$_1$,..,x$_n$ whose size is exactly the same as the size of the cipher block. Each block is then encrypted independently using the fixed key k.
+
+\begin{example}
+	An example is a substitution cipher applied to letters. What we do is to split the plaintext into single letters that are encrypted independently.
+	\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.6]{images/Lec4/blockciphers.png}
+		\caption{Example of ECB encryption with substitution cipher.}
+		\label{fig:exampleECBEnc}
+	\end{figure}
+	Decryption operation is done by reversing the scheme.
+	\begin{figure}[H]
+		\centering
+		\includegraphics[scale=0.6]{images/Lec9/ECBDec.png}
+		\caption{Example of ECB decryption with substitution cipher.}
+		\label{fig:exampleECBDec}
+	\end{figure}
+\end{example}
+
+Pros of this approach:
+\begin{itemize}
+	\item this scheme has the advantage of being very simple and fast, especially on multi-core computers;
+	\item each single encryption/decryption can be performed independently. 
+\end{itemize}
+
+But there are a lot of cons:
+\begin{itemize}
+	\item the security of the scheme is poor;
+	\item as monoalphabetic classic ciphers equal plaintext blocks are encrypted in the same way;
+	\item this allows for the construction of a code-book mapping ciphertexts back to plaintexts;
+	\item often in practice part of a plaintext is fixed due (for example) to the message format. E.g., a mail starting with "Dear Alice, ..";
+	\item if we know a part of the plaintext, we know how the blocks containing that part are encrypted;
+	\item we can use this information to decrypt other parts of the message, whenever we see the same block occurring;
+	\item complete absence of integrity, an attacker in the middle might duplicate, swap, eliminate encrypted blocks and this would correspond to a plaintext where the same blocks are duplicated, swapped, eliminated;
+	\item with information about the format of the plaintext, an attacker might be able to obtain a different meaningful plaintext;
+	\item how critical is this attack depends on the applications, but it is not a good idea to leave such an easy opportunity.
+\end{itemize}
+	
+In Figure \ref{fig:exampleImageECB} we can see that large areas with the same uniform colour maintain the same pattern when encrypted using ECB.
+
+The weakness of this method is that we use always the same key.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{images/Lec9/imageECB.png}
+	\caption{Image encrypted with ECB.}
+	\label{fig:exampleImageECB}
+\end{figure}
+
+\subsubsection{Cipher Block Chaining mode (CBC)}
+This mode solves or mitigates all the previous issues of ECB, it prevents equal plaintexts to be encrypted the same way and, at the time, it provides a higher degree of integrity, even if it is not yet satisfactory on this aspect. The idea is to "chain" encryption of blocks using the previous encrypted block. The first block is chained with a special number called \textbf{Initialization Vector} (IV) that can be sent in clear but has to be random and has to change every time (for every cipher mode).
+
+Encryption and decryption schemas are represented in Figure \ref{fig:encCBC} and in Figure \ref{fig:decCBC}.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.55]{images/Lec9/encCBC.png}
+	\caption{Encryption schema of CBC.}
+	\label{fig:encCBC}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.55]{images/Lec9/decCBC.png}
+	\caption{Decryption schema of CBC.}
+	\label{fig:decCBC}
+\end{figure}
+
+Pros of this method:
+\begin{itemize}
+	\item as mentioned above, CBC never encrypts the same plaintext block in the same way, preventing the code-block attack;
+	\item integrity is improved, but is not yet satisfactory. If an attacker swaps, duplicates or eliminates encrypted blocks, this will result in at least one corrupted plaintext block (for example, changing y$_1$ propagates to y$_2$). Notice however that this might be unnoticed at the application level and, again, we cannot leave to the application the whole task of checking integrity of decrypted messages (the application might not check $y_1$). 
+\end{itemize}
+
+The cons are:
+\begin{itemize}
+	\item using xor introduces a new weakness: the attacker manipulating one bit of an encrypted block y$_i$ obtains that the same bit of plaintext x$_{i+1}$ is also manipulated (because we use a xor);
+	\item at the same time x$_i$ is corrupted;
+	\item we cannot do parallel computations.
+\end{itemize}
+
+\begin{exercise}
+	Write the expression for CBC encryption and decryption of the i-th block and show, formally, that D$_k^{CBC}$(E$_k^{CBC}$(x$_i$))=x$_i$. To avoid defining a special expression for y$_1$, you can let y$_0$=IV.
+	
+	E$_k^{CBC}$(x$_i$) = E$_k$(x$_i \oplus$y$_{i-1}$);\\
+	D$_k^{CBC}$(y$_i$) = D$_k \oplus$y$_{i-1}$.
+	
+	\setcounter{equation}{0}
+	\begin{align}
+		D_k^{CBC}(E_k^{CBC}(x_i)) &= D_k^{CBC}(E_k(x_i \oplus y_{i-1}))\\
+		&= D_k(E_k(x_i \oplus y_{i-1})) \oplus y_{i-1}\\
+		&= (x_i \oplus y_{i-1}) \oplus y_{i-1}\\
+		&= x_i \oplus (y_{i-1} \oplus y_{i-1})\\
+		&= x_i
+	\end{align}
+\end{exercise}
+
+\subsubsection{Output Feedback mode (OFB)}
+We now see two modes of operation that "transform" block ciphers into \textbf{stream ciphers}. The general idea is to use the block cipher to generate a complex key stream. Encryption is then performed by just XORing the plaintext blocks with the keys of the stream. Intuitively, this is like one-time-pad with a generated key stream, the more the stream is close to a random stream, the more the cipher will be close to a perfect one.
+
+The encryption and decryption schemas of OFB are represented in Figure \ref{fig:encOFB} and in Figure \ref{fig:decOFB}.
+
+Notice that the key generation is completely independent of the plaintext and ciphertext. In fact, it is possible to generate the key stream offline, having key k, and perform encryption later on, when necessary.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.55]{images/Lec9/encOFB.png}
+	\caption{Encryption schema of OFB.}
+	\label{fig:encOFB}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.55]{images/Lec9/decOFB.png}
+	\caption{Decryption schema of OFB.}
+	\label{fig:decOFB}
+\end{figure}
+
+Decryption simply consists of "swapping the arrows" when performing the XOR: ciphertexts are XORed with the key stream to recover the plaintexts.
+
+The generation of the key stream is CBC encryption of a zero plaintext, it is thus possible to reuse CBC implementations to compute it. Notice also that the plaintext blocks can be smaller than the size of the block cipher. In that case it is possible to use part of the key and use the remaining part for the next block. For example, if the size of the block is 128 bits (like in AES), and we have to encrypt a single byte, we have that one key can be slit into 128/8=16 keys of 8 bits, each used to encrypt a single byte.
+
+Pros of this method:
+\begin{itemize}
+	\item This cipher is very efficient (key can be precomputed using CBC) and allows for the encryption of streams of plaintexts;
+	\item key stream is generated through a block cipher which makes it very hard to be predicted
+\end{itemize}  
+
+The cons:
+\begin{itemize}
+	\item this stream cipher is synchronous since the key stream is independent of the plaintext;
+	\item as a consequence, if we reuse the same IV with the same key, we obtain the same key stream. Since encryption is XOR, attacking the cipher is the same as attacking one-time-pad when the key is used more than once. Thus the IV must be changed any time we encrypt a new message under the same key k;
+	\item moreover, an attacker in the middle can arbitrarily manipulate bits of the plaintext by swapping the corresponding bits in the ciphertext. No decrypted blocks will be corrupted. For this reason this mode should only be used in applications where integrity of the exchanged message is not an issue or is achieved via additional mechanism. An example could be satellite transmissions where an attacker is extremely unlikely to be in the middle and confidentiality is the only issue;
+	\item in this setting, absence of integrity becomes useful to avoid noise propagation: an error on one bit will only affect one bit of the plaintext.
+\end{itemize}
+
+\subsubsection{Counter mode (CTR)}
+It is a variation of OFB where the IV is a random number (nounce) and a counter. The random number can be sent in clear (bit should change at any new stream generation) and the counter changes value during the stream generation. It is widely used in practice.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.8]{images/Lec9/encCTR.png}
+	\caption{Encryption schema of CTR.}
+	\label{fig:encCTR}
+\end{figure}
+
+\subsubsection{Cipher Feedback mode (CFB)}
+This mode mitigates the problems of OFB by making the key stream dependent on the previous encrypted element. To preserve the ability of encrypting plaintexts of size less than or equal to the size of the block of the cipher (a single byte for example), this mode uses shift register that is updated at each step. The register is shifted to the left the number of bits of previous ciphertext (8 for a byte), and such a ciphertext is copied into the rightmost bit of the register.
+
+Encryption and decryption schemas are reported in Figure \ref{fig:encCFB} and in figure \ref{fig:decCFB}.
+
+In decryption, as for OFB, the key stream is generated and XORed to the ciphertexts to reconstruct the plaintexts.
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.55]{images/Lec9/encCFB.png}
+	\caption{Encryption schema of CFB.}
+	\label{fig:encCFB}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.55]{images/Lec9/decCFB.png}
+	\caption{Decryption schema of CFB.}
+	\label{fig:decCFB}
+\end{figure}
+
+Pros:
+\begin{itemize}
+	\item this mode provides a higher degree of integrity with respect to OFB: whenever one bit of one ciphertext is modified, the next BSize/CSize plaintexts are corrupted, where BSize is the size of the block of the cipher (128 bytes for example) and CSize is the size of the single ciphertext (8 bits for example);
+	\item for example, with AES and 8 bits of plaintext/ciphertext sizes we have 128/8=16 corrupted decryptions;
+	\item this number corresponds to the number of left shifts necessary for a ciphertext to exit the shift register.
+\end{itemize}
+
+Cons:
+\begin{itemize}
+	\item this cipher is slower than OFB as it requires the previous ciphertext to compute the next, meaning that parallelization is impossible when encrypting;
+	\item moreover, for noisy transmission (satellite, Tv, ..) it has the problem of propagating an error on a single bit over the next BSize/CSize plaintexts, which are completely corrupted.
+\end{itemize}
+
+\begin{exercise}
+	Encode the plaintext "Two One Nine Two" with AES. The key is "Thats my Kung Fu".
+	
+	First of all we have to transform the plaintext and the key into a Hex notation, using the ASCII table.
+	
+	Two One Nine Two $\rightarrow$ \texttt{54 77 6F 20 4F 6E 65 20 4E 69 6E 65 20 54 77 6F}\\
+	Thats my Kung Fu $\rightarrow$ \texttt{54 68 61 74 73 20 6D 79 20 4B 75 6E 67 20 46 75}
+	
+	Writing into matrices we have:
+	\begin{center}
+		\[P=\left[ \begin{array}{cccc}
+			54 & 4F & 4E & 20 \\
+			77 & 6E & 69 & 54 \\
+			6F & 65 & 6E & 77 \\
+			20 & 20 & 65 & 6F \\
+		\end{array} \right] \ \ \ \ 
+		K=
+		\left[ \begin{array}{cccc}
+			54 & 73 & 20 & 67 \\
+			68 & 20 & 4B & 20 \\
+			61 & 6D & 75 & 46 \\
+			74 & 79 & 6E & 75 \\
+		\end{array} \right]
+		\]
+	\end{center}
+
+	Now we have to apply Key expansion for 10 rounds as we are using a 128-bits key.
+	
+	We AddRoundKey, XORing P and K, to do the XOR, we have to transform Hex to binary and then go back to represent the result:
+	\begin{center}
+		\[\left[ \begin{array}{cccc}
+		00 & 3C & 6E & 47 \\
+		1F & 4E & 22 & 74 \\
+		0E & 08 & 1B & 31 \\
+		54 & 59 & 0B & 1A \\
+		\end{array} \right]\]
+	\end{center}
+	At this point we apply SubBytes, a fixed non-linear substitution, called S-Box is applied to each byte of the block.
+	\begin{center}
+		\[\left[ \begin{array}{cccc}
+		63 & EB & 9F & A0 \\
+		C0 & 2F & 93 & 92 \\
+		AB & 30 & AF & C7 \\
+		20 & CB & 2B & A2 \\
+		\end{array} \right]\]
+	\end{center}
+
+	ShiftRows: rows of the block matrix are shifted to the left by 0,1,2,3 respectively.
+	\begin{center}
+		\[\left[ \begin{array}{cccc}
+		63 & EB & 9F & A0 \\
+		2F & 93 & 92 & C0 \\
+		AF & C7 & AB & 30 \\
+		A2 & 20 & CB & 2B \\
+		\end{array} \right]\]
+	\end{center}
+	
+	MixColumns: columns of the block are multiplied by the following matrix:
+	
+	\begin{center}	
+		\[ \left[ \begin{array}{c}
+		c_0 \\
+		c_1 \\
+		c_2 \\
+		c_3
+		\end{array} \right]
+		=
+		\left[ \begin{array}{cccc}
+		2 & 3 & 1 & 1 \\
+		1 & 2 & 3 & 1 \\
+		1 & 1 & 2 & 3 \\
+		3 & 1 & 1 & 2 \\
+		\end{array} \right]
+		\left[ \begin{array}{c}
+		c_0 \\
+		c_1 \\
+		c_2 \\
+		c_3
+		\end{array} \right]
+		\]
+	\end{center}
+	So:
+	\begin{center}	
+		\[ 
+		\left[ \begin{array}{cccc}
+		02 & 03 & 01 & 01 \\
+		01 & 02 & 03 & 01 \\
+		01 & 01 & 02 & 03 \\
+		03 & 01 & 01 & 02 \\
+		\end{array} \right]
+		\times		
+		\left[ \begin{array}{cccc}
+		63 & EB & 9F & A0 \\
+		2F & 93 & 92 & C0 \\
+		AF & C7 & AB & 30 \\
+		A2 & 20 & CB & 2B \\
+		\end{array} \right]		
+		=
+		\left[ \begin{array}{cccc}
+		BA & 84 & E8 & 1B \\
+		75 & A4 & 8D & 40 \\
+		F4 & 8D & 06 & 7D \\
+		7A & 32 & 0E & 5D \\
+		\end{array} \right]
+		\]
+	\end{center}
+	At the end we have to XOR again our block with the new key obtained by the Key extension algorithm.
+	\begin{center}	
+		\[ 
+		\left[ \begin{array}{cccc}
+		BA & 84 & E8 & 1B \\
+		75 & A4 & 8D & 40 \\
+		F4 & 8D & 06 & 7D \\
+		7A & 32 & 0E & 5D \\
+		\end{array} \right]
+		\oplus		
+		\left[ \begin{array}{cccc}
+		E2 & 91 & B1 & D6 \\
+		32 & 12 & 59 & 79 \\
+		FC & 91 & E4 & A2 \\
+		F1 & 88 & E6 & 93 \\
+		\end{array} \right]		
+		=
+		\left[ \begin{array}{cccc}
+		58 & 15 & 59 & CD \\
+		47 & B6 & D4 & 39 \\
+		08 & 1C & E2 & DF \\
+		8B & BA & E8 & CE \\
+		\end{array} \right]
+		\]
+	\end{center}
+
+	This is the result of one round, we have to repeat 9 other times to obtain the final matrix.
+\end{exercise}
 \end{document}
 
 
