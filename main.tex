@@ -1648,6 +1648,266 @@ The product is done modulo the irreducible polynomial x$^8$+x$^4$+x$^3$+x+1, irr
 	
 	We repeat the process and we obtain the final reminder x$^4$+x$^2$.
 \end{exercise}
+
+\chapter*{Lecture 8}
+An example of optimization on numbers (on polynomial we will use XOR instead of SUM) is the following:
+\begin{example}
+	Let's multiplicate 11 and 1011.
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|c|c|c|}
+			\hline
+			\textbf{a} & \textbf{b} & \textbf{p} \\ \hline
+			11 & 1011 & 0\\
+			110 & 101 & 0$\oplus$11=11\\
+			1100 & 10 & 11$\oplus$110=101\\
+			11000 & 1 & 101\\
+			110000 & & 101$\oplus$11000 = 11101\\
+			\hline
+		\end{tabular}
+	\end{table}
+	Once we have an empty space in the \textbf{b} column, we will have the result of the multiplication in the \textbf{p} column.
+\end{example}
+
+The method seen at the end of the last lecture is, on average, quadratic with respect to the number of bits (8). Instead, the method just seen takes a number of steps equals to the length of the number in the \textbf{b} column.
+
+\begin{python}
+	def AESmult(a,b):
+		p=0										#p is 0 at  the beginning
+		for i in range(0,8):	#for the 8 bits of a and b do:
+			if b&1 != 0:				#the least significant bit of b is set
+				p = p^a						#sum a to p (xor)
+			b>>=1								#shift b to the right
+			hbit = (a&0x80)!=0	#true if the most significant bit of a is set
+			a<<=1								#shift a to the left
+			if hbit:						#if the most significant bit of a was set
+				a=a^0x11b					#sum 100011011 to a xor, this always  returns a 8-bits number
+		return p
+\end{python}
+This method works only if the resulting number smaller than x$^7$.
+
+To test the above code it is sufficient to open a python shell (by running python from the terminal) and copy-paste the function into the shell, giving enter at the end.\\
+\texttt{AESmult(0b11010011,0b00111010)} will produce 197 as result, \texttt{bin (AESmult (0b11010011, 0b00111010))} will produce 0b11000101.
+\newpage
+The correctness of the optimization of the product derives from invariant after each loop:
+\begin{itemize}
+	\item ab+p is the product of the initial a and b (all operations are done in the Galois Field);
+	\item since b is 0 at the end, we have that p contains the product.
+\end{itemize}
+
+Some observations:
+\begin{itemize}
+	\item b is shifted to the right and a is shifted to the left, meaning that we respectively divide and multiply by x the two polynomials;
+	\item if b is odd, the polynomial is not divisible by x, so we throw away the least significant bit (this is what the right shift does) and we accumulate one a in p to compensate and keep the invariant;
+	\item when a becomes more than 2$^8$, we need to sum to it the modulus 100011011 (the irreducible polynomial), i.e. 0x11b, to keep it 8-bits long.
+\end{itemize}
+
+\section*{The AES cipher}
+Advanced Encryption Standard (AES) is a symmetric key algorithm that uses the same key for both encryption and decryption processes, it operates on a 4$\times$4 matrix of bytes. We have that 16 bytes are 128 bits which is, in fact, the block size. Plaintext bytes b$_1$,...,b$_{16}$ are copied in the matrix by columns following this scheme:
+\begin{center}$
+	\begin{bmatrix}
+		b_1 & b_5 & b_9 & b_{13}\\
+		b_2 & b_6 & b_{10} & b_{14}\\
+		b_3 & b_7 & b_{11} & b_{15}\\
+		b_4 & b_8 & b_{12} & b_{16}\\
+	\end{bmatrix}$
+\end{center}
+
+Cipher keys have lengths of 128, 192 and 256 bits. AES has 10 rounds for 128-bits keys, 12 rounds for 192-bits keys and 14 rounds for 256-bits keys. Rijndael was designed to handle additional block sizes and key lengths, however they are not adopted in the AES standard.
+
+A round is composed of different operations, all of which are invertible:
+\begin{itemize}
+	\item bitwise xor;
+	\item fixed non-linear substitution;
+	\item shifting of matrix rows;
+	\item matrix column multiplications.
+\end{itemize}
+
+\subsubsection{AddRoundKey}
+The round key is bitwise xor-ed with the block. A round key is thus 128 bits, independently of the chosen key size. 
+
+\begin{wrapfigure}[12]{l}{0.47\textwidth}
+	%\centering
+	\includegraphics[width=0.45\textwidth]{images/Lec8/AddRoundKey.png}
+	\caption{AddRoundKey.}
+	\label{fig:addroundkey}
+\end{wrapfigure}
+\subsubsection{SubBytes}
+A fixed non-linear substitution, called S-box, is applied to each byte of the block. Given a byte in hexadecimal notation, the first digit is used to select a row and the second one to select a columns. For examle 0x25 would be the third row (2) and the sixth column (5), giving 0x3f. The standard AES S-box is reported in Figure \ref{fig:sbox}. This S-box hs been obtained by taking, for each byte, its multiplicative inverse in the field. This can bencomputed efficiently via an algorithm that we will see later on, noted b$_7$,...,b$_0$, and applying the affine transformation.
+\[b_i=b_i \oplus b_{i+4 \ mod8}\oplus b_{i+5 \ mod8}\oplus b_{i+6 \ mod8}\oplus b_{i+7 \ mod8}\oplus c_i\]
+with $c_i$ representing the i-th bit of 01100011.\\
+
+\begin{wrapfigure}[4]{r}{0.47\textwidth}
+	%\centering
+	\includegraphics[width=0.45\textwidth]{images/Lec8/SubBytes.png}
+	\caption{SubBytes.}
+	\label{fig:subbytes}
+\end{wrapfigure}
+
+Using multiplicative inverses is known to give non-linear properties, while the affine transformation complicates the attempt of algebraic reductions.
+\vspace{35mm}
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{images/Lec8/sbox1.png}
+	\caption{Standard AES S-box.}
+	\label{fig:sbox}
+\end{figure}
+
+\begin{wrapfigure}[0]{r}{0.47\textwidth}
+	%\centering
+	\includegraphics[width=0.45\textwidth]{images/Lec8/ShiftRows.png}
+	\caption{ShiftRows.}
+	\label{fig:shiftrows}
+\end{wrapfigure}
+
+
+\subsubsection{ShiftRows}
+Rows of the block matrix are shifted to\\the left by 0,1,2,3 respectively. The shift\\is circular.
+\vspace{5mm}
+\subsubsection{MixColumns}
+Column of the block matrix are multiplied by the following matrix:
+
+\begin{center}	
+	\[ \left[ \begin{array}{c}
+	c_0 \\
+	c_1 \\
+	c_2 \\
+	c_3
+	\end{array} \right]
+	=
+	\left[ \begin{array}{cccc}
+	2 & 3 & 1 & 1 \\
+	1 & 2 & 3 & 1 \\
+	1 & 1 & 2 & 3 \\
+	3 & 1 & 1 & 2 \\
+	\end{array} \right]
+	\left[ \begin{array}{c}
+	c_0 \\
+	c_1 \\
+	c_2 \\
+	c_3
+	\end{array} \right]
+	\]
+\end{center}
+For example, the first byte of each column is computed as \[2c_0\oplus 3c_1\oplus c_2\oplus c_3\]
+
+\begin{wrapfigure}[11]{l}{0.47\textwidth}
+	%\centering
+	\includegraphics[width=0.45\textwidth]{images/Lec8/MixColumns.png}
+	\caption{MixColumns.}
+	\label{fig:mixcolumns}
+\end{wrapfigure}
+We have mentioned that AES uses round keys in the AddRoundKey step. These keys are in fact derived from the initial AES key as follows. Keys are represented as arrays of words of 4 bytes. So, for example, a 128 bits key will be 4 words of 4 bytes, i.e., 16 bytes.\\
+This is expanded into an array of size 4*(Nr+1), where Nr is the number of rounds. In this way we obtain 4 different words of key for each round.
+
+Here is the overall scheme for AES assuming that variable state is initialized with the 4$\times$4 matrix of the plaintext (see above) and w[] has been initialized by key expansion.
+
+\begin{python}
+	AddRoundKey(state, w[0,3])
+	
+	for round in range(1,Nr):
+		SubBytes(state)
+		ShiftRows(state)
+		MixColumns(state)
+		AddRoundKey(state, w[round*4,round*4+3])
+	
+	SubBytes(state)
+	ShiftRows(state)
+	AddRoundKey(state, w[Nr*4,Nr*4+3])
+\end{python}
+
+At each round a new key is generated.
+\newpage
+The AES decryption is compute applying inverse operations:
+\begin{python}
+	AddRoundKey(state, w[Nr*4,Nr*4+3])
+	
+	for round in range(Nr-1,0,-1):
+		InvShiftRows(state)
+		InvSubBytes(state)
+		AddRoundKey(state, w[round*4,round*4+3])
+		InvMixColumns(state)
+		
+	InvShiftRows(state)
+	InvSubBytes(state)
+	AddRoundKey(state, w[0,3])
+\end{python}
+
+InvSubBytes is computed by using the inverse substitution of the S-Box in Figure \ref{fig:inversesbox}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{images/Lec8/inversesbox.png}
+	\caption{Standard AES inverted S-box.}
+	\label{fig:inversesbox}
+\end{figure}
+
+InvMixColumns is given by the following operation:
+
+\begin{center}	
+	\[ \left[ \begin{array}{c}
+	c_0 \\
+	c_1 \\
+	c_2 \\
+	c_3
+	\end{array} \right]
+	=
+	\left[ \begin{array}{cccc}
+	0e & 0b & 0d & 09 \\
+	09 & 0e & 0b & 0d \\
+	0d & 09 & 0e & 0b \\
+	0b & 0d & 09 & 0e \\
+	\end{array} \right]
+	\left[ \begin{array}{c}
+	c_0 \\
+	c_1 \\
+	c_2 \\
+	c_3
+	\end{array} \right]
+	\]
+\end{center}
+
+The algorithm for decryption is written in a form similar to the one for encryption but operations are not in the same order. It can, in fact, become the very same algorithm by noticing that SubBytes and ShiftRows commute. It does not matter if we first apply the byte-wise substitution or if we first shift the rows. The final result will be the same. Of course, the same holds for the inverse transformations InvMixColumns(state roundKey) = InvMixColumns(state) InvMixColumns(roundKey). This allows for inverting the two functions, provided that InvMixColumns is applied to all the round keys.
+
+Call dw the array containing the round keys transformed via InvMixColumns. The final decryption algorithm is:
+\begin{python}
+	AddRoundKey(state, w[Nr*4,Nr*4+3])
+	
+	for round in range(Nr-1,0,-1):
+	InvSubBytes(state)
+	InvShiftRows(state)
+	InvMixColumns(state)
+	AddRoundKey(state, w[round*4,round*4+3])
+	
+	InvSubBytes(state)
+	InvShiftRows(state)
+	AddRoundKey(state, w[0,3])
+\end{python}
+
+This is exactly the sam as the one for encryption, but with the inverse functions. Having the same algorithm for encryption and decryption simplifies a lot implementations, especially if they are done in hardware.
+
+\begin{exercise}
+	Using the algorithm with a,b and p, multiply (x$^4$+x$^3$+1)$\times$(x$^5$+1)
+	
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|c|c|c|}
+			\hline
+			\textbf{a} & \textbf{b} & \textbf{p} \\ \hline
+			11001 & 100001 & 0\\
+			110010 & 10000 & 0$\oplus$11001=11001\\
+			1100100 & 1000 & 11001\\
+			11001000 & 100 & 11001\\
+			110010000 & 10 & 11001\\
+			(XOR) 10001011 & 10 & 11001\\
+			100010110 & 1 & 11001\\
+			(XOR)1101 & 1 & 11001\\
+			11010 & & 11001$\oplus$1101=10100\\
+			\hline
+		\end{tabular}
+	\end{table}
+\end{exercise}
+
 \end{document}
 
 

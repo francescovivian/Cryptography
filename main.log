@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  24 MAR 2021 18:24
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  25 MAR 2021 01:57
 entering extended mode
 **./main.tex
 (main.tex
@@ -2312,14 +2312,66 @@ Overfull \hbox (4.0252pt too wide) in paragraph at lines 1635--1636
 ir-re-ducible poly-no-mial x$[]$+x$[]$+x$[]$+x+1
  []
 
-
-AED: lastpage setting LastPage
 [37]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1651.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1651.
+Overfull \hbox (5.90497pt too wide) in paragraph at lines 1689--1691
+\T1/zi4/m/n/12 AESmult(0b11010011,0b00111010) \T1/cmr/m/n/12 will pro-duce 197 
+as re-sult, \T1/zi4/m/n/12 bin (AESmult (0b11010011,
+ []
+
+[38
+
+]
+<images/Lec8/AddRoundKey.png, id=493, 1284.8pt x 999.735pt>
+File: images/Lec8/AddRoundKey.png Graphic file (type png)
+<use images/Lec8/AddRoundKey.png>
+Package pdftex.def Info: images/Lec8/AddRoundKey.png  used on input line 1731.
+(pdftex.def)             Requested size: 204.85846pt x 159.39644pt.
+ [39]
+Underfull \hbox (badness 10000) in paragraph at lines 1737--1739
+
+ []
+
+<images/Lec8/SubBytes.png, id=502, 1927.2pt x 999.735pt>
+File: images/Lec8/SubBytes.png Graphic file (type png)
+<use images/Lec8/SubBytes.png>
+Package pdftex.def Info: images/Lec8/SubBytes.png  used on input line 1742.
+(pdftex.def)             Requested size: 204.85846pt x 106.2643pt.
+<images/Lec8/sbox1.png, id=503, 297.36093pt x 282.30469pt>
+File: images/Lec8/sbox1.png Graphic file (type png)
+<use images/Lec8/sbox1.png>
+Package pdftex.def Info: images/Lec8/sbox1.png  used on input line 1751.
+(pdftex.def)             Requested size: 208.15123pt x 197.61192pt.
+<images/Lec8/ShiftRows.png, id=504, 1927.2pt x 713.66624pt>
+File: images/Lec8/ShiftRows.png Graphic file (type png)
+<use images/Lec8/ShiftRows.png>
+Package pdftex.def Info: images/Lec8/ShiftRows.png  used on input line 1758.
+(pdftex.def)             Requested size: 204.85846pt x 75.85733pt.
+[40 <./images/Lec8/AddRoundKey.png> <./images/Lec8/SubBytes.png> <./images/Lec8
+/sbox1.png>]
+<images/Lec8/MixColumns.png, id=517, 1927.2pt x 1022.82124pt>
+File: images/Lec8/MixColumns.png Graphic file (type png)
+<use images/Lec8/MixColumns.png>
+Package pdftex.def Info: images/Lec8/MixColumns.png  used on input line 1796.
+(pdftex.def)             Requested size: 204.85846pt x 108.71819pt.
+
+Underfull \hbox (badness 2057) in paragraph at lines 1800--1802
+\T1/cmr/m/n/12 This is ex-panded into an ar-ray of size
+ []
+
+[41 <./images/Lec8/ShiftRows.png> <./images/Lec8/MixColumns.png>]
+<images/Lec8/inversesbox.png, id=542, 297.36093pt x 282.30469pt>
+File: images/Lec8/inversesbox.png Graphic file (type png)
+<use images/Lec8/inversesbox.png>
+Package pdftex.def Info: images/Lec8/inversesbox.png  used on input line 1840.
+(pdftex.def)             Requested size: 208.15123pt x 197.61192pt.
+ [42 <./images/Lec8/inversesbox.png>] 
+AED: lastpage setting LastPage
+[43]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1911.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1911.
  (main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1651.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1651.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1911.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1911.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
@@ -2332,13 +2384,13 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 36016 strings out of 480893
- 685048 string characters out of 2898027
- 1406328 words of memory out of 3000000
- 50944 multiletter control sequences out of 15000+200000
+ 36176 strings out of 480893
+ 687539 string characters out of 2898027
+ 1411620 words of memory out of 3000000
+ 51025 multiletter control sequences out of 15000+200000
  555095 words of font info for 81 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 81i,12n,96p,827b,1668s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 81i,12n,96p,827b,2484s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/cm-super/cm
 -super-t1.enc}{C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips
 /inconsolata/i4-t1-0.enc}{C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/font
@@ -2373,9 +2425,9 @@ blic/cm-super/sfrm1440.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fo
 nts/type1/public/cm-super/sfrm1728.pfb><C:/Users/vivia/AppData/Local/Programs/M
 iKTeX 2.9/fonts/type1/public/cm-super/sfti1200.pfb><C:/Users/vivia/AppData/Loca
 l/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfti1440.pfb>
-Output written on main.pdf (38 pages, 1111472 bytes).
+Output written on main.pdf (44 pages, 1497718 bytes).
 PDF statistics:
- 611 PDF objects out of 1000 (max. 8388607)
- 251 named destinations out of 1000 (max. 500000)
- 83 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 735 PDF objects out of 1000 (max. 8388607)
+ 323 named destinations out of 1000 (max. 500000)
+ 113 words of extra memory for PDF output out of 10000 (max. 10000000)
 
