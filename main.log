@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  26 MAR 2021 10:58
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  26 MAR 2021 19:52
 entering extended mode
 **./main.tex
 (main.tex
@@ -2476,14 +2476,38 @@ Overfull \hbox (11.24834pt too wide) detected at line 2386
 = (3\OML/cmm/m/it/12 ; \OT1/cmr/m/n/12 2)
  []
 
-
-AED: lastpage setting LastPage
 [57]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2388.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 2388.
+<images/Lec11/simmkeys.png, id=720, 334.24875pt x 246.1697pt>
+File: images/Lec11/simmkeys.png Graphic file (type png)
+<use images/Lec11/simmkeys.png>
+Package pdftex.def Info: images/Lec11/simmkeys.png  used on input line 2394.
+(pdftex.def)             Requested size: 204.85846pt x 150.88072pt.
+<images/Lec11/publickeys.png, id=721, 512.66531pt x 294.34969pt>
+File: images/Lec11/publickeys.png Graphic file (type png)
+<use images/Lec11/publickeys.png>
+Package pdftex.def Info: images/Lec11/publickeys.png  used on input line 2410.
+(pdftex.def)             Requested size: 204.85846pt x 117.621pt.
+<images/Lec11/asymenc.png, id=723, 369.63094pt x 202.50656pt>
+File: images/Lec11/asymenc.png Graphic file (type png)
+<use images/Lec11/asymenc.png>
+Package pdftex.def Info: images/Lec11/asymenc.png  used on input line 2422.
+(pdftex.def)             Requested size: 240.25725pt x 131.62769pt.
+ [58
+
+ <./images/Lec11/simmkeys.png> <./images/Lec11/publickeys.png>]
+Overfull \hbox (20.31136pt too wide) in paragraph at lines 2429--2430
+[]\T1/cmr/m/n/12 Encryption and de-cryp-tion al-go-rithms are de-fined such tha
+t D$[]$(E$[]$(M)) = M holds. 
+ []
+
+[59 <./images/Lec11/asymenc.png>] [60] [61] 
+AED: lastpage setting LastPage
+[62]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 2563.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 2563.
  (main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2388.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2388.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 2563.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 2563.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
@@ -2496,10 +2520,10 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 36309 strings out of 480893
- 689957 string characters out of 2898027
- 1412370 words of memory out of 3000000
- 51092 multiletter control sequences out of 15000+200000
+ 36387 strings out of 480893
+ 691208 string characters out of 2898027
+ 1412538 words of memory out of 3000000
+ 51123 multiletter control sequences out of 15000+200000
  555095 words of font info for 81 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  81i,12n,96p,827b,2484s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -2537,9 +2561,9 @@ blic/cm-super/sfrm1440.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fo
 nts/type1/public/cm-super/sfrm1728.pfb><C:/Users/vivia/AppData/Local/Programs/M
 iKTeX 2.9/fonts/type1/public/cm-super/sfti1200.pfb><C:/Users/vivia/AppData/Loca
 l/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfti1440.pfb>
-Output written on main.pdf (58 pages, 1725138 bytes).
+Output written on main.pdf (63 pages, 1814561 bytes).
 PDF statistics:
- 883 PDF objects out of 1000 (max. 8388607)
- 376 named destinations out of 1000 (max. 500000)
- 168 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 961 PDF objects out of 1000 (max. 8388607)
+ 419 named destinations out of 1000 (max. 500000)
+ 183 words of extra memory for PDF output out of 10000 (max. 10000000)
 

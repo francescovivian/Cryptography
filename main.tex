@@ -2384,7 +2384,182 @@ The meet-in-the-middle attack is still possible in 3DES but it reduces the cost 
 	5 & 11 \\
 	\end{array} \right]\text{mod}26= (176+35, 55+77) \text{mod}26 = (211, 132) \text{mod}26 = (3,2)
 	\]
-\end{exercise}   
+\end{exercise}
+
+\chapter*{Lecture 11}
+All the ciphers we have studied so far use the same key K both for encryption and decryption, this implies that the source and the destination of the encrypted data have to share K. For this reason, this kind of ciphers are also known as symmetric-key ciphers.
+
+\begin{wrapfigure}[12]{r}{0.47\textwidth}
+	%\centering
+	\includegraphics[width=0.45\textwidth]{images/Lec11/simmkeys.png}
+	\caption{Symmetric key graph.}
+	\label{fig:simmkeys}
+\end{wrapfigure}
+
+It becomes problematic if we want cryptography to scale to big systems with many users willing to communicate securely. Unless we have a centralized service to handle keys, for N users, this would require the exchange of N(N-1)/2 keys, O(N$^2$). From another point of view, this is a complete graph.
+\begin{example}
+	If we have N=4, we would have $\frac{4\times 3}{2}=6$ channels and 6 pairs of symmetric keys.
+\end{example}
+
+Symmetric key ciphers make sense until we have a reasonable number of users.
+
+For example in a LAN with 1000 users, we would have $\approx500000$ keys. these keys should be pre-distributed to users in a secure way (e.g., offline) but this is totally impractical and would never scale on a wide-area network such as the Internet.
+
+\begin{wrapfigure}[11]{l}{0.47\textwidth}
+	%\centering
+	\includegraphics[width=0.45\textwidth]{images/Lec11/publickeys.png}
+	\caption{Public keys idea.}
+	\label{fig:publickeys}
+\end{wrapfigure}
+
+To overcome this problem, in 1976, Whitfield Diffie and Martin Hellman proposed the asymmetric-key ciphers. The idea is the following: a user A has one encrypting and one decrypting key. They are different but correlated (this is why they are called asymmetric). The encrypting key is public, the decrypting key is a secret, known only by A.
+
+The public key is published in a public list and is known by everybody, even the attacker. Public and private keys are correlated but the knowledge of the public key does not give any information about the private key.
+
+A schema of public key cryptography is shown in Figure \ref{fig:asymenc}. 
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{images/Lec11/asymenc.png}
+	\caption{Public key encryption schema.}
+	\label{fig:asymenc}
+\end{figure}
+
+We define the public key of A with \textbf{PK$_A$} and the secret key of A with \textbf{SK$_A$}. If B wants to send a message to A, he sends E$_{PK_A}$(M), when A receives the messages, he decrypt it as D$_{SK_A}$(E$_{PK_A}$(M)).
+
+Encryption and decryption algorithms are defined such that D$_{SK_A}$(E$_{PK_A}$(M)) = M holds.
+
+\begin{definition}
+	An \textbf{asymmetric-key cipher} is a quintuple (P,C,K$_S\times$K$_P$,E,D) with E:K$_P\times$P$\rightarrow$C and D:K$_S\times$C$\rightarrow$P and such that:
+	\begin{itemize}
+		\item it is computationally easy to generate a key-pair (SK,PK) in K$_S\times$K$_P$;
+		\item it is computationally easy to compute y=E$_{PK}$(x);
+		\item is is computationally easy to compute x=D$_{SK}$(y).
+	\end{itemize}
+\end{definition}
+
+As said before, D$_{SK}$(E$_{PK}$(x))=x. It is computationally infeasible to to compute SK knowing PK and y. It is also infeasible to compute D$_{SK}$(y) knowing PK and y and without knowing SK.
+
+As encryption is performed under PK while decryption under SK, the decryption key is now different from the encryption key.
+
+What security properties do we have? We achieve secrecy because the attacker is not able to decrypt the message as it doesn't have the secret key SK. On the other hand we cannot assure authentication, everybody can send a message to A saying it is B (with symmetric keys this does not happen). For this reason we need a digital signature.
+
+\subsubsection{One-way-trap-door functions}
+\begin{definition}
+	An injective, invertible function is \textbf{one-way} iff:
+	\begin{itemize}
+		\item y=f(x) is easy to compute;
+		\item x=f$^{-1}$(y) is infeasible to compute.
+	\end{itemize}
+\end{definition}
+
+\begin{definition}
+	An injective, invertible family of functions f$_k$ is \textbf{one-way trap-door}, iff given k:
+	\begin{itemize}
+		\item y=f$_k$(x) is easy to compute;
+		\item x=f$_k^{-1}$(y) is infeasible to compute without knowing the secret trap-door S(k) relative to k.
+	\end{itemize}
+\end{definition}
+
+The trap-door is a hidden way to go back to the preimage x of the function, only knowing the trap-door we can compute f$_k^{-1}$(y).
+
+\section*{The Merkle-Hellman knapsack system}
+This cipher has been broken, but still gives an idea of how asymmetric-key ciphers relate to one-way-trap-door functions. It is based on the following NP-complete problem:
+
+\textbf{The subset-sum problem}: Let s$_1$,..,s$_n$ and T be positive integers. s$_i$ are sizes while T is the target. A solution to the subset-sum problem is a subset of (s$_1$,..,s$_n$) whose sum is exactly the target T. Formally, the solution is a binary tuple (x$_1$,..,x$_n$) such that $\sum_{i=1}^{n}$x$_i$s$_i$=T.
+
+\begin{example}
+	If sizes are (4,6,3,8,1) and T=11, we have that (0,0,1,1,0) and (1,1,0,0,1) are solutions, since 3+8=11 and 4+6+1=11.
+\end{example}
+
+This problem is NP-complete in general, as a consequence, we can easily obtain a one-way function from it.\\
+If we define f(x$_1$,..,x$_n$)=$\sum_{i=1}^{n}$x$_i$s$_i$ we have that f is clearly easy to compute but inverting this function amounts to finding (x$_1$,..,x$_n$) from a target T which we know to be infeasible for a big n.
+
+How can we now introduce a secret trap-door to allow us to invert the function? The trick is to start from a specific instance of the problem that it is easy to solve.
+
+We consider special sizes that are super-increasing, i.e., such that s$_i>\sum_{j=1}^{i-1}$s$_j$, for each i>1. This means that any s$_i$ is bigger than the sum of all the previous s$_j$. For example (1,3,5,10) is super-increasing, while (1,3,5,9) is not. In this special case there is a very efficient algorithm to solve the subset-sum problem. The idea is to start from the biggest element s$_n$ and go back to the first one: if s$_i$ fits into T, we pick it (we set x$_i$=1), and we subtract s$_i$ from T. The code for the algorithm is the following:
+
+\begin{python}
+	def subsetSum(S,T):			#assumes S is a super-increasing list of integers
+		x=[]
+		S.reverse()						#reverse the list to start from the biggest
+		for s in S:						#iterates on all s_i (from the biggest)
+			if s<=T:
+				x.append(1) 			#takes the element
+				T=T-s							#subtract it from T
+			else:
+				x.append(0)				#does not take the element
+		if T==0:							#solution found
+			x.reverse()
+			return x						#returns the reversed tuple
+		else:
+			return []						#no solution found
+\end{python}
+
+\subsubsection{The cipher}
+\begin{itemize}
+	\item We start from a super-increasing problem (s$_1$,..,s$_n$);
+	\item we choose a prime \textbf{p}>$\sum_{i=1}^{n}$s$_i$;
+	\item we choose a random \textbf{a} such that 1<a<p;
+	\item we transform the initial super-increasing problem into $\hat{\text{s}_1},..,\hat{\text{s}_n}$, with $\hat{\text{s}_i}$=as$_i$ mod\textit{p}. Notice that this problem is not super-increasing in general.
+\end{itemize}
+
+\begin{example}
+	Let (1,2,5,12) be a super-increasing sequence, p=23 and a=6. Compute s$_i$a mod\textit{p}.
+	\begin{center}
+		(1*6) mod 23 = 6\\
+		(2*6) mod 23 = 12\\
+		(5*6) mod 23 = 7\\
+		(12*6) mod 23 = 3
+	\end{center}
+	Thus we obtain the sequence (6,12,7,3).
+\end{example}
+
+The trap-door is composed of (s$_1$,..,s$_n$), p and a, that are kept secret.\\
+The public key is ($\hat{\text{s}_1},..,\hat{\text{s}_n}$).
+
+To encrypt we first have to translate the message from ASCII to binary obtaining x$_1$,..x$_n$ and then we can encrypt it as follows:
+\begin{center}
+	E$_{PK}$(x$_1$,..,x$_n$) = $\sum_{i=1}^{n}$x$_i\hat{\text{s}_i}$
+\end{center}
+
+For example, given the plaintext (1,0,0,1) and the sequence (6,12,7,3) we have E$_{PK}$(1,0,0,1) = 1*6 + 0*12 + 0*7 + 1*3 = 6 + 3 = 9.
+
+The decryption works as follows: D$_{SK}$(y) is the solution of the super-increasing problem (s$_1$,..,s$_n$) with target a$^{-1}$y mod\textit{p}.
+\begin{example}
+	a$^{-1}$ is 4, since a=6, p=23, 6*4 mod 23 = 1.
+	
+	Given E$_{PK}$(1,0,0,1) = 9, to decrypt we have to compute the target a$^{-1}$*9 mod\textit{p} = 4*9 mod 23 = 13.
+	
+	We finally solve the super-increasing problem (1,2,5,12) with target 13 with target 13: subsetSum([1,2,5,12],13) = [1,0,0,1] which gives the initial plaintext (1,0,0,1).
+\end{example} 
+
+\begin{exercise}
+	Let (2,7,11,21,42,89,180,354) be a super-increasing sequence, p=881 and a=588 (secret key).\\
+	Compute the public key s$_i$*a mod\textit{p}.\\
+	Then compute the encryption and the decryption of letter "a".
+	
+	Public key:
+	\begin{center}
+		2*588 mod 881 = 295\\
+		7*588 mod 881 = 592\\
+		11*588 mod 881 = 301\\
+		21*588 mod 881 = 14\\
+		42*588 mod 881 = 28\\
+		89*588 mod 881 = 353\\
+		180*588 mod 881 = 120\\
+		354*588 mod 881 = 236\\
+	\end{center}
+	So the public key is (295,592,301,14,28,353,120,236).
+	
+	Letter "a" in binary is (0,1,1,0,0,0,0,1)
+	Encrypting it we obtain:\\
+	E$_{PK}$(0,1,1,0,0,0,0,1) = 592 + 301 + 236 = 1129.
+	
+	To decrypt, we need to find a$^{-1}$, it is 442, since 588*442 mod 881 = 1.
+	The target is: 442*1129 mod 881 = 372.
+	subsetSum([2,7,11,21,42,89,180,354],372) = [0,1,1,0,0,0,0,1] and this is the binary value of letter "a". 
+	
+\end{exercise}
 \end{document}
 
 
