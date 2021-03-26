@@ -2227,6 +2227,164 @@ Cons:
 
 	This is the result of one round, we have to repeat 9 other times to obtain the final matrix.
 \end{exercise}
+
+\chapter*{Lecture 10}
+In addition to AES there are many other block ciphers in use, such as DES, 3-DES, IDEA, Blowfish and Twofish, RC2, RC5, RC6, ..
+
+\section*{Data Encryption Standard (DES)}
+DES is a symmetric key algorithm, the predecessor of AES. It has been published in 1975 and derives from Lucifer (IBM). It has been the most used and implemented cipher in the history and it is currently used in many applications, especially in the triple version. DES major problem is the key-length (only 56 bits) that is considered vulnerable with modern parallel computers.
+
+The first attack known in history goes back to January 1999, when distributed.net and the Electronic Frontier Foundation collaborated to publicly break a DES key in 22 hours and 15 minutes. There are also some analytical results which demonstrate theoretical weakness in the cipher, although they are infeasible to mount in practice.
+
+\begin{wrapfigure}[17]{r}{0.47\textwidth}
+	%\centering
+	\includegraphics[width=0.45\textwidth]{images/Lec10/DESschema.png}
+	\caption{DES encryption schema.}
+	\label{fig:desschema}
+\end{wrapfigure}
+DES takes a fixed-length string of plaintext bits and transforms it through a series of complicated operations into another ciphertext bit string of the same length. The block size is 64 bits an the key length is 56 bits (8 for error correction). It has 16 identical rounds, the encryption starts with an initial permutation (IP) and ends with a final permutation (FP, inverse operation). Before the main rounds, the block is divided into two 32-bit halves and processed alternatively. This criss-crossing is known as the \textbf{Feistel scheme}.
+
+\subsubsection{The Feistel function (F)}
+Feistel function consists of different operations: Expansion (from 32 to 48 bits), Key-mixing (key schedule), Substitution S-box (results 32 bits) and Permutation. The schema of the function is represented in Figure \ref{fig:feistel}.
+
+The alternation of substitution from the S-boxes, and permutation of bits from the P-box and E-expansion provides the so-called \textbf{"confusion and diffusion"} (Shannon).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.15]{images/Lec10/feistel.png}
+	\caption{Feistel function.}
+	\label{fig:feistel}
+\end{figure}
+\textbf{Confusion} is the process that drastically changes data from input to the output (e.g., by translating data through a non-linear table created from the key).
+
+\textbf{Diffusion}: changing a single character of the input will change many characters of the output. 
+
+\section*{International Data Encryption Algorithm (IDEA)}
+IDEA was proposed in 1990 as a substitute of DES and it is currently adopted in many applications. It is not based on non-linear substitutions (S-Boxes), confusion and diffusion are obtained by a combination of three operations: xor, sum and multiplication modulo 2$^{16}$. Patent issues have reduced the popularity of this cipher. Compared to other, IDEA performance is not so high.
+
+\section*{Blowfish and Twofish}
+Blowfish has been proposed in 1993, it is very fast, compact and simple to implement, with a very highly configurable security: key length is variable up to 448 bits which allows for security/speed trade-off. As DES, it is based on xor and S-Boxes which are not fixed but computed using the cipher itself and the actual key. This key-dependent S-Boxes make brute-forcing particularly expensive: for each key, it is necessary to generate the S-Boxes which takes 522 iterations of the algorithm. Twofish is one of the finalists of AES and "successor" of Blowfish, both ciphers have been developed by Bruce Schneier.
+
+\section*{RC2, RC5, RC6}
+They are a family of ciphers developed by Ron Rivest.
+\begin{itemize}
+	\item RC2 (1987): it is vulnerable to a related-key attack using 2$^{34}$ chosen plaintext;
+	\item RC5 (1994): it uses data dependent rotation, it is extremely simple but it requires a complex key-expansion procedure: each round is just two XORs, two sums modulo and two rotations. This cipher is highly configurable on the number of rounds, key-length and word-length, which allows for a sophisticate trade-off between security and performance;
+	\item RC6 (derived from RC5): it has been one of the AES finalists. 
+\end{itemize}
+
+\section*{3DES}
+3DES is a triple iteration of DES, it is implemented, for example, in SSH, TLS/SSL and it is adopted in many commercial applications. Bank circuit and credit card issuers use 3DES in smartcard-based applications and for PIN protection.
+
+The aim of 3DES is to increase key-length. Due to the meet-in-the-middle attack, the triple key of 168 bits is, in fact, equivalent in strength to a key of 112 bits. Meet-in-the-middle is also the reason why 2DES makes no sense: the 112-bits key could be broken in a 2$^{56}$ time/space complexity brute force attack.
+
+One technique is to strengthen ciphers in iteration. All modern ciphers are based on rounds, i.e., repetitions of the same core algorithm. What happens if we iterate a while cipher such as DES or AES? It increases the key length. DES has 56-bit key that is considered weak nowadays. If we iterate the cipher three times using different keys, we obtain (k$_1$, k$_2$, k$_3$) of 168 bits which is too hard to break.
+
+We know that iteration make sense only if the cipher is not idempotent. The following informal argument suggests that modern ciphers are very unlikely to be idempotent. We reason on DES bu the same reasoning would apply to different block ciphers.
+
+\subsubsection{DES is non-idempotent}
+DES has a block size of 64 bits, if we list all the 2$^{64}$ possible blocks and we pick one DES key k, the cipher will map each of these blocks into a different block. Since encryption must be invertible, this mapping is injective. Thus, in any block cipher, a key corresponds to a permutation of all the possible plaintext blocks:
+\begin{center}
+	0 $\rightarrow$ $\rho(0)$\\
+	1 $\rightarrow$ $\rho(1)$\\
+	2 $\rightarrow$ $\rho(2)$\\
+	...\\
+	2$^{64}$-1 $\rightarrow$ $\rho(2^{64}-1)$
+\end{center}
+The number of permutations of 2$^{64}$ elements is 2$^{64}!$ which is enormously big compared to the 2$^{56}$ DEs keys. The way a DES key selects a specific permutation is "complex", otherwise the cipher would be weak. We can thus think of DES keys as selecting a random subset of 2$^{56}$ permutations among the 2$^{64}!$ possible ones.
+
+The probability that the composition of two such permutations is still in this subset (i.e., DES is idempotent) is 2$^{56}$/2$^{64}!$, which is a negligible number. This means that it is really unlikely that 2 iterations of DES (and of any modern block cipher, in fact) correspond to a single encryption under a different key. Thus DES is non-idempotent (there exists also formal proofs).
+
+\section*{Meet-in-the-middle}
+Meet-in-the-middle is a known plaintext scenario, i.e., the attacker knows pair of plaintext/ciphertext (X,Y), (X',Y'), (X'',Y''), .., all encrypted under the same key k. The idea is to select one pair, say (X,Y), and try to decrypt Y with all the possible second keys k$_2$. All the resulting values Z are stored into a table together with the key, which is indexed by Z.
+\begin{table}[H]
+	\centering
+	\begin{tabular}{|c|c|}
+		\hline
+		\textbf{Z} & \textbf{key}\\ \hline
+		D$_0$(Y) & 0\\
+		D$_1$(Y) & 1\\
+		... & ...\\
+		D$_{2^{56}-1}$(Y) & 2$^{56}$-1\\ \hline
+	\end{tabular}
+\end{table} 
+
+Now we try to encrypt under all the possible first keys k$_1$ the plaintext X and we look the obtained value into the table. If we find a match, we test the resulting pair (k$_1$,k$_2$) on all the other plaintext/ciphertext pairs and, if all the tests succeeds, we give it as output.
+
+The computational cost of this attack is 2$^{57}$ steps and 2$^{56}$ space. In fact, first step takes 2$^{56}$ steps to build a table which has 2$^{56}$ entries. Second step takes at most 2$^{56}$ steps to find the right key. We thus have 2$^{56}$ + 2$^{56}$ = 2$^{57}$ steps (vs brute force).
+
+\subsubsection{False keys}
+It is very important that, whenever a pair (k$_1$,k$_2$) for (X,Y) is found, it is tested against other pairs (X',Y'). It could be the case, in fact, that a key pair is fine for (X,Y) but it is not the right key pair, this can happen more frequently than expected.
+
+To estimate the number of these false keys we assume that plaintexts are mapped to ciphertext uniformly by the possible keys. i.e., the number of keys mapping X into Y is approximatively the same as the number of keys mapping X into any other ciphertext Y'. This assumption typically holds for any good cipher for which observing Y gives very little information about the plaintext X. Having a non-uniform distribution would imply that the plaintexts
+mapped by more keys into Y are more likely than the ones mapped by less keys.
+
+Under these assumptions, we can then estimate the number of false keys as |K|/|C|, i.e., the number of keys divided by the number of ciphertexts which is, for 2DES, 2$^{112}$/2$^{64}$=2$^{48}$. This huge number of possible keys encrypting X into Y can be reduced very quickly by testing keys on more pairs.
+
+The probability that a false key is also OK for (X',Y') is just 1 over the number of all the possible ciphertexts (we have only one good case Y' over all the possible 2$^{64}$ ciphertexts) giving 1/2$^{64}$. Thus, the number of false keys is reduced to 2$^{48}$/2$^{64}$ = 1/2$^{16}$. If we try on one more pair we get 1/2$^{80}$, and so on. In summary, with 3 available pairs of plaintext/ciphertext we can run the attack having a negligible probability of getting a false key.
+
+\subsubsection{Lesson learned}
+The cost in time is thus basically the same as the one for a single iteration of DES, for this reason 2DES is never used in practice and, instead, we have a triple iteration known as triple-DES (3DES), this gives a 168-bit triple key (k$_1$,k$_2$,k$_3$).
+
+The meet-in-the-middle attack is still possible in 3DES but it reduces the cost in time to 2$^{112}$ with a table of size 2$^{56}$ entries. The idea is to build the table by decrypting Y under all k$_3$ and then try all the pairs (k$_1$,k$_2$).
+
+\begin{exercise}
+	Encode message M=(3,2) using the Hill cipher with key matrix
+	\[K=
+	\left[ \begin{array}{cc}
+		3 & 1 \\
+		1 & 2 \\
+	\end{array} \right]
+	\]
+	Decode the found encrypted message.
+	
+	\[E_k(3,2) = (3,2) \times 
+	\left[ \begin{array}{cc}
+		3 & 1 \\
+		1 & 2 \\
+	\end{array} \right] \text{mod}26 = (9+2,3+4) \text{mod}26 = (11,7)
+	\]
+	Decryption:
+	\[K^{-1} = \text{det}^{-1}(K)
+	\left[ \begin{array}{cc}
+		2 & -1 \\
+		-1 & 3 \\
+	\end{array} \right] \text{mod}26 =
+	\text{det}^{-1}(K)
+	\left[ \begin{array}{cc}
+		2 & 25 \\
+		25 & 3 \\
+	\end{array} \right] \text{mod}26 
+	\]
+	\[
+	\text{det}(K)=(6-1) \text{mod}26=5
+	\]
+	\[\text{det}^{-1}(K)=21, (21\times 5) \text{mod}26 =1\]
+	\[
+	K^{-1} =
+	21
+	\left[ \begin{array}{cc}
+	2 & 25 \\
+	25 & 3 \\
+	\end{array} \right] \text{mod}26 =
+	\left[ \begin{array}{cc}
+		42 & 525 \\
+		525 & 63 \\
+	\end{array} \right] \text{mod}26 = 
+	\left[ \begin{array}{cc}
+	16 & 5 \\
+	5 & 11 \\
+	\end{array} \right]
+	\]
+	
+	\[D_k(11,7) = 
+	(11,7)
+	\left[ \begin{array}{cc}
+	16 & 5 \\
+	5 & 11 \\
+	\end{array} \right]\text{mod}26= (176+35, 55+77) \text{mod}26 = (211, 132) \text{mod}26 = (3,2)
+	\]
+\end{exercise}   
 \end{document}
 
 
