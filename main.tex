@@ -2711,6 +2711,43 @@ The Python code of the algorithm is the following:
 \end{python}
 
 The number of steps in the worst case is O(k$^2$) for the two multiplications, iterated k times, giving O(k$^3$). Thus for 1024 bits we can expect about 1 billion steps, which is still efficient on modern machines.
+
+\chapter*{Lecture 13}
+\begin{exercise}
+	Perform encryption and decryption using the RSA algorithm for the following:
+	\begin{center}
+		p=7, q=11, a=7, x=2
+	\end{center} 
+
+	We compute n=pq=77 and $\phi$(n)=(p-1)(q-1)=60.
+	
+	We compute the unique b=43 as 7*43 mod 60 = 1.
+	
+	PK=(43,77), SK(7,77)
+	
+	E$_{PK}$(2) = 2$^43$ mod 77 = 30.\\
+	D$_{SK}$(30) = 30$^7$ mod 77 = 2.
+\end{exercise}
+
+\begin{exercise}
+	Try to compute 2$^8$ where 8 is 1000 and x=2.
+	
+	We can use the squareAndMultiply algorithm:
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|c|c|c|}
+			\hline
+			\textbf{r} & \textbf{bit} & \textbf{r}\\ \hline
+			1*1=1 & 1 & 1*2=2\\
+			2*2=4 & 0 &\\
+			4*4=16 & 0 &\\
+			16*16=256 & 0 &\\ \hline
+		\end{tabular}
+	\end{table}
+	The result is thus 2$^8$=256.
+\end{exercise}
+\vspace{50mm}
+\textit{Continuare da minuto 36 con nuova parte}
 \end{document}
 
 
