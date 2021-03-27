@@ -2748,6 +2748,164 @@ The number of steps in the worst case is O(k$^2$) for the two multiplications, i
 \end{exercise}
 \vspace{50mm}
 \textit{Continuare da minuto 36 con nuova parte}
+
+\chapter*{Lecture 14}
+\begin{exercise}
+	Perform the encryption and decryption using the RSA algorithm for the following:
+	\begin{itemize}
+		\item p=3, q=11, a=7, x=5
+		
+		We compute n=pq=33 and $\phi$(n)=(p-1)(q-1)=20.
+		
+		We compute the unique b=3 as 7*3 mod 20 = 1.
+		
+		PK=(3,33), SK(7,33)
+		
+		E$_{PK}$(5) = 5$^3$ mod 33 = 26.\\
+		D$_{SK}$(26) = 26$^7$ mod 33 = 5.
+		\item p=5, q=11, b=3, x=9
+		
+		We compute n=pq=55 and $\phi$(n)=(p-1)(q-1)=40.
+		
+		We compute the unique a=27 as 27*3 mod 40 = 1.
+		
+		PK=(3,55), SK(27,55)
+		
+		E$_{PK}$(9) = 9$^3$ mod 55 = 14.\\
+		D$_{SK}$(14) = 14$^27$ mod 55 = 9.
+	\end{itemize}
+\end{exercise}
+
+\begin{exercise}
+	Try to compute x$^{15}$ where 15 is 1111.
+	
+	We can use the squareAndMultiply algorithm:
+	
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|c|c|c|}
+			\hline
+			\textbf{r} & \textbf{bit} & \textbf{r}\\ \hline
+			1*1=1 & 1 & 1*x=x\\
+			x*x=x$^2$ & 1 & x$^2$*x=x$^3$\\
+			x$^3$*x$^3$=x$^6$ & 1 & x$^6$*x=x$^7$\\
+			x$^7$*x$^7$=x$^{14}$ & 1 & x$^{14}$*x=x$^{15}$\\ \hline
+		\end{tabular}
+	\end{table}
+\end{exercise}
+
+\begin{exercise}
+	Assume that in our RSA public key cryptosystem the public key is (b,n)=(141,391).
+	\begin{itemize}
+		\item Find the deciphering key (a,n).
+		\item Assume that you have received the enciphered message y=306. Decipher it.
+		\item Why is this encryption not secure?
+	\end{itemize}
+
+	Since n=391 can only be obtained from 17*23, we have now the values of p and q.\\
+	At this point we can compute $\phi$(n)=(p-1)(q-1)=352.\\
+	We then compute the unique a=5 as 5*141 mod 352 = 1.
+	
+	At this point we have the secret key (a,n)=(5,391). We can decrypt 306 this way:\\
+	D$_{SK}$(306)=306$^5$ mod 391 = 17.
+	
+	This encryption is not secure because n is too small and an attacker can simply factorize it to obtain p and q.
+\end{exercise}
+
+\begin{exercise}
+	Consider a composition of this substitution cipher with this key:
+	\begin{center}
+		\texttt{A B C D E F G H I J K L M N O P Q R S T U V W X Y Z}\\
+		$\downarrow$\\
+		\texttt{Q P E O X C D N J M W H S A R Y T F B K I L G Z U V}
+	\end{center}
+	with a shift cipher with k=7.
+	\begin{itemize}
+		\item Show the encryption of the plaintext \texttt{JAVA} using the composition of the two ciphers.
+		
+		\begin{center}
+			J $\rightarrow$ M + 7 = T\\
+			A $\rightarrow$ Q + 7 = X\\
+			V $\rightarrow$ L + 7 = S\\
+			A $\rightarrow$ Q + 7 = X\\
+		\end{center}
+		\item Show that you can obtain the same encryption with a unique substitution cipher and show the new key.
+		
+		We can shift the substitution cipher's key by 7 obtaining the following new key:
+		\begin{center}
+			\texttt{A B C D E F G H I J K L M N O P Q R S T U V W X Y Z}\\
+			$\downarrow$\\
+			\texttt{X W L V E J K U Q T D O Z H Y F A M I R P S N G B C}
+		\end{center}
+		If we encrypt JAVA with this new key we obtain:
+		\begin{center}
+			J $\rightarrow$ T\\
+			A $\rightarrow$ X\\
+			V $\rightarrow$ S\\
+			A $\rightarrow$ X\\
+		\end{center}
+	\end{itemize}
+	Show the encryption of the plaintext \texttt{JAVA} using the composition of the two ciphers.
+\end{exercise}
+
+\begin{exercise}
+	Consider a cipher in which plaintexts and ciphertexts are of \textbf{d} bits (|P|=|C|=2$^d$), and the keys are of e$\le$d bits (|K|=2$^e$). The encryption function is:\\
+	E$_{k_0,..,k_{e-1}}$(x$_0$,...,x$_{d-1}$) = x$_0\oplus$k$_{0 \text{mod} \ e}$,..,x$_i\oplus$k$_{i \text{mod} \ e}$,...,x$_{d-1}\oplus$k$_{(d-1) \text{mod} \ e}$.
+	
+	\begin{itemize}
+		\item Consider the case d=8 and e=1 and show the two possible encryptions of plaintext 11001011.
+		
+		With e=1 we have 2$^1$=2 different keys of length 1, assuming that k$_0$=0 and k$_1$=1 we obtain the following encryption:\\
+		E$_{0,1}$(11001011) = 11001011
+		
+		On the other hand, if we consider k$_0$=1 and k$_1$=0 we will obtain:\\
+		E$_{1,0}$(11001011) = 00110100.
+		\item Show with a counterexample that if e<d the cipher is not perfect.
+		
+		We remember that a cipher is perfect iff P$p$(x|y)=P$_p$(x) for all x in P and i in C.
+		
+		We can take e=d-1. In this case (d-1) mod \textit{e} = 0, thus k$_0$=k$_{d-1}$
+		
+		Let's assume as a possible plaintext 11010100 with d=8 and P$_p$(11010100)>0. Then
+		P$_p$(x|y)=P$_p$(11010100|00000000)=0 (this can never happen). For this reason it is not a perfect cipher.
+	\end{itemize}
+\end{exercise}
+
+\begin{exercise}
+	It is given an encryption scheme called CKC (cipher key changing) defined as follows. Given a X=x$_1$,...,x$_n$, we compute Y=y$_1$,...,y$_n$ as:
+	\begin{itemize}
+		\item y$_1$ = E$_k$(x$_1$);
+		\item y$_i$ = E$_{y_{i-1}}$(x$_i$) for all 1<i$\le$n.
+	\end{itemize}
+	Draw the encryption and decryption schema of CKC and discuss its (in)security.
+	\vspace{10mm}
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.7\linewidth]{images/Lec14/encCKC.png}
+			\caption{Encryption.}
+			\label{fig:encCKC}
+		\end{subfigure}%
+		\begin{subfigure}{.5\textwidth}
+			\centering
+			\includegraphics[width=.7\linewidth]{images/Lec14/decCKC.png}
+			\caption{Decryption.}
+			\label{fig:decCKC}
+		\end{subfigure}
+		\caption{Encryption and decryption schema of CKC.}
+		\label{fig:encdecCKC}
+	\end{figure}
+	This cipher is insecure because with y$_i$ an attacker can decrypt y$_i+1$ and all the following blocks.
+\end{exercise}
+
+\begin{exercise}
+	It is proposed an electronic voting scheme where the votes of the electors are sent to a server with a simple encryption E$_k$(v), where v is the id of a candidate. Assume an attacker can intercept messages to the server, show a simple attack scenario (similar to the codebook attack) where the secrecy of the votes is violated without finding k or cryptoanalyzing the cipher. Propose a technique that improves the security of the protocol.
+	
+	The number of possible candidates is limited. An attacker can send his/her vote x, see E$_k$(x) and find how many people have voted in the same way (violates the privacy). If the possible candidates are two he can know the final result in advance.
+	
+	To improve the security of the protocol, we can use a stream cipher with random IV, add random bytes to the name of the candidate, etc..
+\end{exercise}
 \end{document}
 
 
