@@ -91,6 +91,7 @@
 \newtheorem{example}{\textbf{Example}}
 \newtheorem{exercise}{\textbf{Exercise}}
 \newtheorem{theorem}{\textbf{Theorem}}
+\newtheorem{lemma}{\textbf{Lemma}}
 
 \begin{document}
     \maketitle
@@ -2746,8 +2747,75 @@ The number of steps in the worst case is O(k$^2$) for the two multiplications, i
 	\end{table}
 	The result is thus 2$^8$=256.
 \end{exercise}
-\vspace{50mm}
-\textit{Continuare da minuto 36 con nuova parte}
+
+\section*{Correctness of RSA cipher}
+We want to show that decrypting under the private key a plaintext x encrypted under the public key gives x.
+
+\begin{theorem}[The Euler Theorem]
+	Let a and n be coprime, i.e., gcd(a,n)=1. Then a$^{\phi(n)}$mod\textit{n}=1.
+\end{theorem}
+\begin{proof}
+	Let S=(s$_1$, ..., s$_{\phi(n)}$) be the $\phi$(n) numbers less than n and coprime with n. We consider R=(a*s$_1$mod\textit{n}, ..., a*s$_{\phi(n)}$mod\textit{n}) and we show that S=R. We need a few lemmas.
+	
+	\begin{lemma}\label{lem:EU1}
+		Let x,y be coprime to n. Then x*y is coprime to n.
+	\end{lemma}
+	\begin{proof}
+		This can be easily proved by considering that all divisors of x*y are products of divisors of x and/or y. Thus a common divisor of x*y and n must also divide x and/or y. Thus, gcd(x*y,n)>1 would imply that gcd(x,n)>1 or/and gcd(y,n)>1 giving a contradiction.\\
+	\end{proof}
+
+	\begin{example}
+		Let's consider x=7, y=3, p=5, q=11 and n=55.
+		
+		x=7 and y=3 are coprime to 55, what about x*y=21? gcd(21,55) = gcd(7*3,5*11).
+	\end{example}
+
+	\begin{lemma}\label{lem:EU2}
+		Let x be coprime to n. Then x mod\textit{n} is coprime to n.
+	\end{lemma}
+	\begin{proof}
+		Since x mod\textit{n}=x-k*n, we have that any common divisor \textit{d} of x mod\textit{n} and n must divide x. In fact $\frac{x \ \text{mod} n}{d}=t=\frac{x-kn}{d}=\frac{x}{d}-kr$, that implies $\frac{x}{d}$ is an integer value.
+		
+		That is, d divides x mod\textit{n}, n and x. However, if x is coprime to n, then x mod\textit{n} is coprime to n.\\
+	\end{proof}
+
+	\begin{lemma}\label{lem:EU3}
+		Let a*x mod\textit{n}=a*y mod\textit{n} with gcd(a,n)=1. Then x mod\textit{n}=y mod\textit{n}.
+	\end{lemma}
+	\begin{proof}
+		We have a*x-k*n=a*x mod\textit{n}=a*y mod\textit{n}=a*y-j*n. Thus a*x-a*y=w*n (w=k-j) that implies a(x-y)/a=w*n/a and so x-y=w*n/a. Since gcd(a,n)=1, we have that a must divide w and so x-y=t*n, i.e., (x-y)mod\textit{n}=t*n mod\textit{n}=0, i.e., x mod\textit{n}=y mod\textit{n}.\\
+	\end{proof}
+	\begin{exercise}
+		Given a=3, n=6 find x and y (different) such that a*x mod\textit{n}=a*y mod\textit{n}.
+		
+		For example x=1 and y=3.\\
+		In this case the Lemma \ref{lem:EU3} doesn't hold because gcd(a,n)=gcd(3,6)=3$\ne$1. 
+	\end{exercise}
+	\begin{exercise}
+		Find a coprime to n (n=6), and find x and y such that a*x mod\textit{n}=a*y mod\textit{n}.
+		
+		We could choose a=5, it is coprime to 6. Values for x and y are x=1 and y=7.\\
+		That is x mod\textit{n} = 1 mod5 = 1 = y mod\textit{n} = 7 mod 6.
+	\end{exercise}
+
+	Putting all together:\\
+	by Lemma \ref{lem:EU1} (Let x,y be coprime to n, then x*y is coprime to n) and \ref{lem:EU2} (Let x be coprime to n, then x mod\textit{n} is coprime to n) we have that all numbers in set R = (a*s$_1$mod\textit{n}, ..., a*s$_{\phi(n)}$mod\textit{n}) are coprime to n and smaller than n.
+	
+	Since S is the set of all numbers coprime to n and smaller than n, we obtain that R$\subseteq$S.\\
+	Now, consider a*s$_i$ mod\textit{n} and a*s$_j$ mod\textit{n} in R. Since a is coprime to n (by hypothesis), by Lemma \ref{lem:EU3} we have that a*s$_i$ mod\textit{n}=a*s$_j$ mod\textit{n} implies s$_i$ mod\textit{n}=s$_j$ mod\textit{n}, which gives a contradiction. Thus we have that a*s$_i$ mod\textit{n}$\ne$a*s$_j$ mod\textit{n} for all i and j. This proves that R=S.
+	
+	To conclude the proof, it is enough to observe that since R=S:
+	\[\prod_{i=1}^{\phi(n)}s_i = \prod_{i=1}^{\phi(n)}as_i \text{mod}n = a^{\phi(n)}\prod_{i=1}^{\phi(n)}s_i \text{mod}n.\]
+	Since all s$_i$ are coprime to n, by applying many times Lemma \ref{lem:EU3} (we divide both sides by s$_1$, then s$_2$, ...), we obtain 1=a$^{\phi(n)}$ mod\textit{n}, which is what we wanted to prove.\\
+\end{proof}
+
+\begin{example}
+	Let p=2, q=3. what happens if a=3 not coprime to n=2*3=6?\\
+	a$^{\phi(n)}$ mod\textit{n} = 3$^{\phi(n)}$ mod6 = 3$^2$ mod6 = 3 $\ne$ 1.
+	
+	Let's consider a=5 (5 is coprime to 6):\\
+	a$^{\phi(n)}$ mod\textit{n} = 5$^{\phi(n)}$ mod6 = 5$^2$ mod6 = 1.
+\end{example}
 
 \chapter*{Lecture 14}
 \begin{exercise}
