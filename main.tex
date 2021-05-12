@@ -2751,7 +2751,7 @@ The number of steps in the worst case is O(k$^2$) for the two multiplications, i
 \section*{Correctness of RSA cipher}
 We want to show that decrypting under the private key a plaintext x encrypted under the public key gives x.
 
-\begin{theorem}[The Euler Theorem]
+\begin{theorem}[The Euler Theorem]\label{teo:eul}
 	Let a and n be coprime, i.e., gcd(a,n)=1. Then a$^{\phi(n)}$mod\textit{n}=1.
 \end{theorem}
 \begin{proof}
@@ -2973,6 +2973,175 @@ We want to show that decrypting under the private key a plaintext x encrypted un
 	The number of possible candidates is limited. An attacker can send his/her vote x, see E$_k$(x) and find how many people have voted in the same way (violates the privacy). If the possible candidates are two he can know the final result in advance.
 	
 	To improve the security of the protocol, we can use a stream cipher with random IV, add random bytes to the name of the candidate, etc..
+\end{exercise}
+
+\chapter*{Lecture 16}
+\textit{Lecture 15 is not present, as it was an exercises class in preparation for the midterm.}
+
+\vspace{10mm}
+Proven the Euler Theorem (\ref{teo:eul}), we now want to prove that, using RSA, if we decrypt and encrypted message, we go back to the initial message.
+
+We have that D$_{SK}$(E$_{PK}$(x)) = (x$^b$ mod n)$^a$ mod n = (x$^b$)$^a$ mod n = x$^{ab}$ mod n. We want to prove that x$^{ab}$ mod n = x, that implies D$_{SK}$(E$_{PK}$(x)) = x. To prove this, we will use the Euler Theorem. Note that ab mod $\phi$(n)=1 implies ab=k$\phi$(n)+1 for some k.
+
+\begin{proof}[Correctness of RSA]
+	First of all we can notice that 
+	\[x^{ab} \ \text{mod} \ n = x^{k\phi(n)+1} \ \text{mod} \ n = (x^{\phi(n)})^kx \ \text{mod} \ n.\]
+	
+	As we have to prove that $(x^{\phi(n)})^kx \ \text{mod} \ n = x$ and $x$ is different from 0, we can simplify it to $(x^{\phi(n)})^k \ \text{mod} \ n = 1$.
+	We split the proof in two cases:
+	\begin{itemize}
+		\item \textbf{gcd(x,n)=1.} In this case we know that the Euler theorem holds, and we directly have that x$^{\phi(n)}$ mod n = 1, which implies (x$^{\phi(n)}$)$^k$ mod n = 1, giving the thesis;
+		\item \textbf{gcd(x,n)>1.} Since x<n, and we know that n=pq, we have that either gcd(x,n)=p or gcd(x,n)=q. We assume gcd(x,n)=p (the proof for the other case is identical).
+		
+		We can write x=pj for some j. We have that gcd(x,q)=1 (as x<n) that, for Euler Theorem, gives x$^{\phi(q)}$ mod q = 1. 
+		
+		This implies x$^{\phi(q)\phi(p)}$ mod q = x$^{\phi(n)}$ mod q = 1 (since p and q are primes, x$^{\phi(n)}$ = x$^{\phi(q)\phi(p)}$, moreover 1$^{\phi(p)}$ mod q = 1).
+		
+		This implies (x$^{\phi(n)}$)$^k$ mod q = 1, giving (x$^{\phi(n)}$)$^k$ = wq + 1 for some w, by definition of modulus.
+		
+		At this point we obtain:
+		\begin{align*}
+		(x^{\phi(n)})^k \ x \ \text{mod} \ n &= (wq + 1)x \ \text{mod} \ n\\
+		&= (wq + 1)jp \ \text{mod} \ n\\
+		&= (wqjp +jp) \ \text{mod} \ n\\
+		&= (wqjp + x) \ \text{mod} \ n\\
+		&= (njw + x) \ \text{mod} \ n\\
+		&= x. 
+		\end{align*}
+	\end{itemize}
+	
+	Thus D$_{SK}$(E$_{PK}$(x)) = x and the RSA cipher is correct.
+\end{proof}
+
+\begin{example}
+	Let's see an example with p=3, q=11, x=2. PK = (b,n) = (3,33); SK = (a,n) = (7,33).\\
+	$\phi$(n)=(p-1)(q-1)=2*10=20\\
+	x$^{ab}$ mod n = x$^7*3$ mod 33 = x$^{21}$ mod 33 = 2$^{21}$ mod 33 = 2097152 mod 33 = 2.
+\end{example}
+
+\subsection*{Inverse modulo}
+We have seen that sometimes we need to compute the inverse of a number, for example in RSA we need to compute \textit{a} and \textit{b}, that are one the inverse of the other in module $\phi$(n). Usually we choose \textit{b} and then we compute its inverse to recover \textit{a}. When gcd(b,$\phi$(n))=1, the inverse is guaranteed to exist by the Euler Theorem. In this particular case there is also an efficient algorithm to compute the inverse based on the Euclidean algorithm for computing gcd. 
+
+\subsubsection{Euclidean algorithm}
+The idea is to compute the gcd(c,d) (when d$\ne$0) as gcd(d, c mod d), since it can be easily seen that they are the same.
+
+\begin{python}
+def Euclid(c,d):
+	while d != 0:
+		tmp = c % d
+		c = d
+		d = tmp
+	return c
+\end{python}
+
+\begin{example}
+	Let's try to compute gcd(15,5):
+	\begin{itemize}
+		\item \texttt{Euclid(15,5)}
+		\item d=5$\ne$0
+		\item tmp=c\%d=15\%5=0
+		\item c=d=5
+		\item d=tmp=0
+		\item return 5
+	\end{itemize}
+	Thus gcd(15,5)=5.
+\end{example}
+
+This algorithm has a very good complexity, it takes O(k$^3$) steps to terminate, where k is the number of bits, given that the number of iterations is O(k) and that divisions, etc. cost O(K$^2$) steps. O(k) iterations can be proved by observing that every 2 steps we at least halve the value d.
+
+Assume that after one step this is not true, so c mod d > d/2. In the next step, we will compute d mod (c mod d) = d-(c mod d) < d/2 (i.e., d-r(c mod d), with (c mod d) > d/2 $\rightarrow$ r=1) giving the thesis.
+
+We know that halving leads to a logarithmic complexity, i.e., linear with respect to the number k of bis.
+
+\subsubsection{Extended Euclidean algorithm}
+We now extend the algorithm so to compute the inverse modulo d whenever gcd(c,d)=1. We substitute the computation of c mod d with:
+\begin{center}
+	\texttt{q=c/d \#integer division}\\
+	\texttt{c-qd  \#this is c\%d}
+\end{center}
+\begin{example}
+	12 mod 5 = 2, q=12/5=2, tmp=12-2*5=2.
+\end{example}
+
+We add two extra variables \texttt{e} and \texttt{f} to the algorithm and we save the initial value of d in \texttt{d0} as follows:
+\begin{python}
+def EuclidExt(c,d):
+	d0 = d
+	e = 1
+	f = 0
+	while d != 0:
+		q = c/d					#integer division
+		tmp = c - q*d		#this is c%d
+		c = d
+		d = tmp
+		tmp = e - q*f		#new computation for the inverse
+		e = f
+		f = tmp
+	if c == 1:
+		return e % d0		#if gcd is 1 we have that e is the inverse
+\end{python}
+
+\texttt{EuclidExt(c,d)} means that we want to compute the inverse of \texttt{c} modulo \texttt{d}.
+
+\begin{example}
+	Let's compute \texttt{EuclidExt(5,17)}:
+	\begin{itemize}
+		\item q=0, tmp=5, c=17, d=5, tmp=1, e=0, f=1;
+		\item q=3, tmp=2, c=5, d=2, tmp=-3, e=1, f=-3;
+		\item q=2, tmp=1, c=2, d=1, tmp=7, e=-3, f=7;
+		\item q=2, tmp=0, c=1, d=0, tmp=-17 e=7, f=-17.
+	\end{itemize}
+	e\%d0=7, so e=7 is the inverse, we can see that 7*5 mod 17 = 1.
+\end{example}
+
+\begin{exercise}
+	Try to compute \texttt{EuclidExt(14,17)}.
+	
+	\begin{itemize}
+		\item q=0, tmp=14, c=17, d=14, tmp=1, e=0, f=1;
+		\item q=1, tmp=3, c=14, d=3, tmp=-1, e=1, f=-1;
+		\item q=4, tmp=2, c=3, d=2, tmp=5, e=-1, f=5;
+		\item q=1, tmp=1, c=2, d=1, tmp=-6, e=5, f=-6;
+		\item q=2, tmp=0, c=1, d=0, tmp=17, e=-6, f=17;
+	\end{itemize}
+	e\%d0=11, so 11 is the inverse, 11*14 mod 17 = 1.
+\end{exercise}
+
+In practice, usually the public exponent \textit{b} is fixed and takes the values of the prime number 2$^{16}$+1=65537. If we use at least 3072 bits, it is secure enough.
+
+If an attacker knows $\phi$(n) and n, he can crack everything by solving the system of equation:
+\begin{align*}
+	\begin{cases}
+		n = pq\\
+		\phi(n) = (p-1)(q-1)
+	\end{cases}
+\end{align*}
+
+\begin{exercise}
+	Decrypt the following ciphertext, which was encrypted using a Shift Cipher:
+	\begin{center}
+		\texttt{BEEAKFYDJXUQYHYJIQRYHTYJIQFBQDUJIIKFUHCQD}
+	\end{center}
+	Using k=10
+	\begin{center}
+		\texttt{LOOK UP IN THE AIR IT S A BIRD IT S A PLANETS SUPERMAN}
+	\end{center}
+\end{exercise}
+
+\begin{exercise}
+	Compute \texttt{EuclidExt(17,5)}
+	
+	\begin{itemize}
+		\item q=3, tmp=2, c=5, d=2, tmp=1, e=0, f=1;
+		\item q=2, tmp=1, c=2, d=1, tmp=-2, e=1, f=-2;
+		\item q=2, tmp=0, c=1, d=0, tmp=5, e=-2, f=5;
+	\end{itemize}
+	e\%d0=3, so 3 is the inverse, 3*17 mod 5 = 1.
+\end{exercise}
+
+\begin{exercise}
+	We intercept a 'strange' ciphertext 0x000..000115E314E61F9 (i.e., lots of 0s at the beginning) that we know it has been encrypted with RSA under a key of 2048 bits long modulus. What can we immediately conclude about the cipher public key, with very high probability, and how can we trivially compute the plaintext?
+	
 \end{exercise}
 \end{document}
 
