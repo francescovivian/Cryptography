@@ -3122,7 +3122,7 @@ If an attacker knows $\phi$(n) and n, he can crack everything by solving the sys
 	\begin{center}
 		\texttt{BEEAKFYDJXUQYHYJIQRYHTYJIQFBQDUJIIKFUHCQD}
 	\end{center}
-	Using k=10
+	Using k=16
 	\begin{center}
 		\texttt{LOOK UP IN THE AIR IT S A BIRD IT S A PLANETS SUPERMAN}
 	\end{center}
@@ -3142,7 +3142,185 @@ If an attacker knows $\phi$(n) and n, he can crack everything by solving the sys
 \begin{exercise}
 	We intercept a 'strange' ciphertext 0x000..000115E314E61F9 (i.e., lots of 0s at the beginning) that we know it has been encrypted with RSA under a key of 2048 bits long modulus. What can we immediately conclude about the cipher public key, with very high probability, and how can we trivially compute the plaintext?
 	
+	The fact that we have a lot of zeros makes us think that the original plaintext was much smaller than the modulus. In other words n is very big and x is so small that encrypting it we do not use the modulus as it is already <n. As we do not used the modulus, we can just do the b-th root of the ciphertext to obtain the original plaintext.
 \end{exercise}
+
+\chapter*{Lecture 17}
+In RSA we need to generate the two big primes \textbf{p} and \textit{q}. How can we?
+
+The easiest (but not so efficient) solution is to use what is called the "\textbf{Sieve of Eratosthenes}". This algorithm allows us to find all the prime numbers less or equal than \textit{N} and works as follows: we pick all numbers from 2 to \textit{N}, starting from the smallest (2, initially) that we call \textit{p}, we remove from the list all of its multiples 2\textit{p}, 3\textit{p}, ... We iterate the procedure by picking the smallest \textit{p} survived from the previous steps.
+
+\begin{example}
+	Let's consider N=10, we will have the list \{2,3,4,5,6,7,8,9,10\}.\\
+	Starting from 2 we remove 4,6,8,10, obtaining \{2,3,5,7,9\}.\\
+	Consider 3 and remove 9, obtaining \{2,3,5,7\}.\\
+	Consider 5 and remove nothing.\\
+	Consider 7 and remove nothing.
+	
+	Thus te the prime numbers remaining in the list are \{2,3,5,7\}.
+\end{example} 
+
+It is not needed to check every time all the multiplies, for example, if I am considering p=3, I can skip 6 as because it is a multiple of 2, it has already been deleted when I was considering p=2. For this reason I can skip all the multiplies up to \textit{p}(\textit{p}-1), so I can start checking from \textit{p}$^2$. Obviously if \textit{p}$^2$ is out of my sequence I can stop the list scanning, so the last item \textit{N} of the list will be checked from $\sqrt{N}$, that means that I stop scanning after the \textit{p}=$\sqrt{N}$ element of the list. 
+
+A simple python implementation is the following:
+\begin{python}
+import sys, math
+
+def Sieve(N):
+	Ns = int(math.sqrt(N))						#square root of N
+	sieve = set(range(2,N+1))					#sets are good to model the sieve
+	for p in range(2,Ns+1):
+		if p in sieve: 									#for all survived numbers
+			for q in range(p*p,N+1,p): 		#we remove multiples bigger than p
+				sieve.discard(q)
+	print sieve												#sieve has only primes
+\end{python}
+
+\begin{example}
+	Sieve(15)=?\\
+	Ns=Int(Sqrt(15))=3, we take the lower part of the square root.\\
+	sieve=\{2,3,4,5,6,7,8,9,10,11,12,13,14,15\}\\
+	p=\{2,3\}\\
+	p=2 in sieve, q=\{2$^2$=4,..,15\}\\
+	sieve=\{2,3,5,7,9,11,13,15\}\\
+	p=3 in sieve, q=\{3$^2$=9,..,15\}\\
+	Sieve(15)=\{2,3,5,7,11,13\}
+\end{example}
+
+\begin{exercise}
+	Sieve(22)=?\\
+	Ns=Int(Sqrt(22))=4, we take the lower part of the square root.\\
+	sieve=\{2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22\}\\
+	p=\{2,3,4\}
+	p=2 in sieve, q=\{2$^2$=4,..,22\}\\
+	sieve=\{2,3,5,7,9,11,13,15,17,19,21\}
+	p=3 in sieve, q=\{3$^2$=9,..,22\}\\
+	sieve=\{2,3,5,7,11,13,17,19\}\\
+	p=4 not in sieve\\
+	Sieve(22)=\{2,3,5,7,11,13,17,19\}
+\end{exercise}
+
+There is a bed news, unfortunately this algorithm takes at least N steps, meaning that it takes 2$^{3072}$ steps for the smallest RSA modulus, that is too much. We can use another approach, we generate two random numbers and then we check if they are primes or not.
+
+There are many \textit{probabilistic} efficient algorithms for primality test. In 2002, Agrawal, Kayal and Saxena proposed the first \textit{deterministic} algorithm for primality test in the paper "\textbf{PRIMALIY is in P}" published on Annals of Mathematics. This is a very important result, but the proposed algorithm is much slower with respect to existing probabilistic ones, as it costs O(k$^6$) which makes it rather slow for k>3072.
+
+\subsubsection{Miller-Rabin test}
+We illustrate one of the most famous probabilistic primality test, due to Miller and Rabin. The algorithm is a \textbf{NO-biased Montecarlo}, i.e., it is always correct for the \textit{NO} answer (meaning that the number is not prime) but can be wrong for the \textit{YES} case (the number is prime). The probability of being wrong, however, is $\le$ than a constant $\epsilon$=$\frac{1}{4}$.
+
+We can repeat the test until the error is small enough. If we run the test \textit{r} times, the probability that it says \textit{YES} and that the number is not prime is less then $\epsilon^r=(\frac{1}{4})^r$. This means that it decreases exponentially with respect to the number of iterations. For example if we pick \textit{r}=128, we have an error with probability less than 1/4$^{128}$, which is less than brute-forcing a typical symmetric key, and so small to be negligible.
+
+The pseudocode of the algorithm is in the following chunk.
+\begin{python}
+Prime(n):
+	write n-1=2^k*m
+	pick a random a such that 1<a<n
+	b=a^m mod n
+	if b==1:
+		return True
+	for i in range(0,k):
+		if b==n-1;
+			return True
+		b=b*b mod n
+	return False
+\end{python}
+
+We can always write n-1 as 2$^k$*m as we will not check the primality for even numbers, but only for odd ones. So if I check the primality of an odd number \textit{n}, I can write the even number \textit{n-1} as 2$^k$*m.
+
+\begin{example}
+	We want to compute \texttt{Prime(7)}:\\
+	n-1=6, it is even and we decompose it as 2$^1$*3. So we have k=1 and m=3.\\
+	We compute b as a$^m$ mod n, we choose a=2 (1<a<n), so b=2$^3$ mod 7=1.\\
+	b=1 so the algorithm returns \texttt{True}.
+	
+	In case we choose a=3, we have b=3$^3$ mod 7=6 and also in this time the algorithm returns \texttt{True}, entering the loop.
+\end{example}
+
+\begin{exercise}
+	Try to compute \texttt{Prime(15)}:\\
+	n-1=14, we can decompose it as 2$^1$*7, having k=1 and m=7.\\
+	We choose a=2 and we compute b=2$^7$ mod 15=8.\\
+	We enter the loop (i=0), b is not equal to n-1 so we compute the new b as b=8*8 mod 15=4.\\
+	(i=1) is already too big to stay in the loop so we exit and return \texttt{False}.
+\end{exercise}
+
+\begin{exercise}
+	Try to compute \texttt{Prime(9)}:\\
+	n-1=8, we can decompose it as 2$^3$*1, so k=3 and m=1.\\
+	We choose a=2 and we compute b=2$^1$ mod 9=2.\\
+	We enter the loop (i=0), b is not equal to n-1 so we compute the new b as b=2*2 mod 9=4.\\
+	(i=1) b is different from n-1, the new b is b=4*4 mod 9=7.\\
+	(i=2) b is different from n-1, the new b is b=7*7 mod 9=4.\\
+	(i=3) is too big to stay in the loop so we exit and return \texttt{False}.
+\end{exercise}
+
+\begin{theorem}
+	The above algorithm is always correct on False answers (NO-biased).
+\end{theorem}
+
+\begin{proof}
+	Let's assume, by contradiction, that the algorithm returns False, but the number n is prime. False is only returned at the last step, which means that the algorithm "survived" all the if branches. In particular we have that a$^m$ mod n $\ne$1. Moreover a$^{m2^i}$ mod n $\ne$n-1, for i=0,...,k-1 (for k cycles b=b*b mod n and b $\ne$n-1).
+	
+	By the assumption that n is prime and by the Euler theorem (a and n are coprime since a<n and n is prime) we know that a$^{\phi(n)}$ mod n = a$^{n-1}$ mod n = a$^{m2^k}$ mod n=1. This is true because, as n is prime, $\phi$(n)=n-1 and we know from the algorithm that we can write n-1=2$^k$*m.
+	
+	In summary we have:
+	\begin{align*}
+		a^m mod \ n &\ne 1,n-1\\
+		a^{{2^1}m} mod \ n &\ne n-1\\
+		a^{{2^2}m} mod \ n &\ne n-1\\
+		&...\\
+		a^{{2^{k-1}}m} mod \ n &\ne n-1\\
+		a^{{2^k}m} mod \ n &= n-1\\		
+	\end{align*}
+	The last condition is given by the Euler theorem.
+	
+	It is easy to show that, if n is prime, then the only square roots of 1 modulo n are n-1 and 1.
+	
+	In fact, r is a square root of 1 iff r$^2$ mod n=1, i.e., r$^2$=z*n+1 for some z, meaning that r$^2$-1=(r+1)(r-1)=z*n which implies (r+1)(r-1)/n=z. Since n is prime, we have that n must divide either (r-1) or (r+1) and so r=-1,1 mod n.
+	
+	Notice that, if n is not prime there might be square roots of 1 different form 1 and (n-1). For example, for n=8, we have that 5$^2$ mod 8=1, meaning that 5 is a square root of 1 modulo 8.
+	
+	It is now sufficient to notice that each of the above values is the square root of the preceding one. Since the last one (a$^{m2^k}$) is equal to 1, we have that the previous (a$^{m2^{(k-1)}}$) is a square root of 1 modulo n, i.e., it is 1 or n-1.
+	
+	Now we know that it is different from n-1 which implies that it is 1. We iterate backward this on all the values until we got a$^m$ mod n=1 which gives a contradiction.
+	
+	This proves that the algorithm can never return \texttt{False} if n is prime.
+
+\end{proof}
+
+A working python implementation is the following:
+\begin{python}
+def Prime(n):
+	m = n-1
+	k = 0
+	while (m&1 == 0): 		#while m is even
+		m = m>>1
+		k += 1
+	a = random.randrange(2,n)
+	b = squareAndMultiply(a.m,n)
+	if b == 1:
+		return True
+	for i in range (k):
+		if b == n-1:
+			return True
+		b = b*b % n
+	return False
+\end{python}
+
+So, how can we generate big primes? We simply generate them at random and we test their primality. This takes about ln(n) steps, where n is the upper bound of the interval we choose from. It can be proved, in fact, that about 1 out of ln(n) numbers less than n are prime. For example, if we want 512 bits of size (for a modulus 1024), we have that ln(n) = log$_2$(n)*ln(2) $\approx$ 512*0.7 $\approx$ 358. Thus, on average, after 358(716) attempts we should find a prime number of size 512 (1024) bits. 
+
+Notice that, the Miller-Rabin algorithm should be iterated to lower as needed the probability of error in case of successful answer. In the original paper, the probability is bounded by 1/4, in a subsequent paper it has been shown that the algorithm is much more precise than that. In practise the suggested number of iterations from NIST are 7,4 and 3 for 512, 1024 and 1536 bits, with an error probability of 2$^{-100}$ , meaning that the test requires very few iterations to give a prime with high probability.
+
+\subsubsection{Case study: OpenSSL}
+\begin{wrapfigure}[11]{r}{0.4\textwidth}
+	%\centering
+	\includegraphics[width=0.37\textwidth]{images/lec17/openssl.png}
+	\caption{Generation of a Private Key using OpenSSL.}
+	\label{fig:openssl}
+\end{wrapfigure}
+
+\textbf{OpenSSL} is a software library for applications that need to secure communications over the internet widely used against eavesdropping and to be sure of the identity of the party at the other end. It contains an open source implementation of the SSL and TLS protocols. It supports a lot of different cryptographic algorithms: \textit{ciphers} (such as AES, Blowfish, DES, IDEA, ..), \textit{cryptographic has functions} (MD5, SHA-1, ...) and \textit{public-key cryptography} (RSA, DSA, ...).
+
+In Figure \ref{fig:openssl} we can see the generation of a Private Key using OpenSSL. It uses a number of iterations slightly bigger than the one suggested above. For a 1024 key as in figure we have 6 occurrences of '+', which represent 6 iterations of the Miller-Rabin test.
 \end{document}
 
 
