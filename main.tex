@@ -3449,6 +3449,138 @@ At this point, the following holds:
 	
 	This reasoning can be applied, similarly, to next steps until a single solution survives. Since each time the interval is split in two, the number of steps is $\lceil$log$_2$(n)$\rceil$. 
 \end{proof}
+
+\chapter*{Lecture 19}
+We will now see a \textit{chosen ciphertext attack} to RSA, it is a simple attack in which the attacker can ch	oose ciphertexts to decrypt. The challenge is to decrypt a ciphertext y' by asking for decryptions of different ciphertexts y$_1$,...,y$_n$. The attack proceeds as follows: she picks a random r such that 1<r<n and is invertible modulo n.
+
+The inverse can be computed using the extended Euclidean Algorithm (if it fails, we pick another random r). The attacker asks for decryption of y$_1$=y'E$_{PK}$(r) mod n. She obtains the plaintext x$_1$=x'r mod n, where x' is the decryption of y'. It is now sufficient to multiply this number by r$^{-1}$ mod n to get x'.
+
+\begin{exercise}
+	Try with n=pq=3*7=21, public key (17,21).
+	
+	First of all we need to compute the secret key, we need to find a such that a*b mod $\phi$(n)=1, so a*17 mod 12=1, we have a=5, so the secret key is (5,21).
+	
+	Now we need to choose r: 1<r(=11)<21. We have to check if it is invertible: r*r$^{-1}$ mod 21=1, 11*r$^{-1}$ mod 21=1, r$^{-1}$=2 is the inverse.
+	
+	The encryption of our r is E$_{PK}$(r)=E$_{PK}$(11)=11$^{17}$ mod 21=2.\\
+	Let us assume we want to find x'=2, thus y'=2$^{17}$ mod 21=11.\\
+	So y$_1$=y'E$_{PK}$(r) mod n=11*2 mod 21=1. Thus x$_1$=1$^5$ mod 21=1.\\
+	The attacker gets x'=x$_1$r$^{-1}$ mod 21=1*2 mod 21=2.
+\end{exercise}
+
+\section*{Digital signatures}
+Asymmetric key cryptography is also employed to develop \textit{digital signature schemas} (i.e., a digital counterpart of classic signature on paper). There are some important features of classic signature that deserve to be discussed in order to understand which are the basic expected properties of any good signature scheme.
+
+Classic signature is physically part of the signed document. We should avoid that a signature can be cut-and-pasted to a different document. So, the signature will depend on the signed document: two different documents signed by the same entity will have different signatures.
+
+Classic signature is verified by comparing it to an official reference signature. This is not possible in the digital world since signature of different documents should always be different. We need a mechanism to verify a signed document with respect to an entity (the signer).
+
+Document signed on paper cannot be easily copied. In the digital world we can trivially cut-and-paste bytes so any signed document can be replicated many times. In certain applications (e.g., e-commerce) signature needs to be integrated with mechanisms to avoid uncontrolled replicas.
+
+Imagining that Bob wants to send a message to Alice, signed using the digital signature, we want that:
+\begin{itemize}
+	\item to sign you need to know the private key;
+	\item to verify you need the public key.
+\end{itemize}
+We remember that only Bob knows his private key and everyone knows Bob's public key.
+
+\begin{definition}
+	A digital signature scheme consists of two functions:
+	\begin{itemize}
+		\item Sig$_{SK}$(x) generates the signature of x using a private key SK;
+		\item Ver$_{PK}$(x,y) checks the validity of signature y on message x using a public key. It returns true if the signature is valid and false otherwise.
+	\end{itemize}
+\end{definition}
+
+We now discuss how the RSA cipher can be used to implement a digital signature scheme. We let:
+\begin{align*}
+	Sig_{SK}(x) &= D_{SK}(x)\\
+	Ver_{PK}(x,y) &= 
+	\begin{cases}
+	true & \text{if}\  E_{PK}(y)=x\\
+	false & \text{otherwise}
+	\end{cases}
+\end{align*}
+Note that, encryption and decryption of RSA are the same function:
+\begin{itemize}
+	\item Sig$_{SK}$(x)=D$_{SK}$(x)=x$^a$ mod n;
+	\item Ver$_{PK}$(x,y)=true if E$_{PK}$(y)=y$^b$ mod n=x.
+\end{itemize}
+
+Note that it is impossible to copy the signature without knowing SK and it is possible to check the signature knowing PK.
+
+\begin{example}
+	Consider p=7, q=13, PK=(5,91), SK=(29,91) and x=35.
+	
+	Sig$_{SK}$(35)=35$^{29}$ mod 91= 42.
+	
+	We check the signature by computing Ver$_{PK}$(35,42)=42$^{5}$ mod 91=35.
+	
+	Thus the signature is valid.
+\end{example}
+
+This scheme is not yet satisfactory as it does not satisfy the security property that without knowing the private key it is computationally infeasible to find a message x and a signature y such that Ver$_{PK}$(x,y) holds, i.e., y is a valid signature for x. We show different ways to find x and y such that Ver$_{PK}$(x,y) holds.
+
+\subsection*{Problems and attacks}
+\subsubsection{Forging a "random" message}
+We (in the middle) pick an arbitrary signature y, we compute the corresponding signed message as E$_{PK}$(y) and we forward this to the receiver instead of x. Since Ver$_{PK}$(E$_{PK}$(y),y)=true, by definition, the receiver does not notice anything wrong, but what he should have received is x and not E$_{PK}$(y) (so he is just checking something wrong).
+
+\subsubsection{Multiplying signed messages}
+If we have two signed message x$_1$, x$_2$ with signatures y$_1$, y$_2$, then y$_1$*y$_2$ mod n is the signature of a message x$_1$*x$_2$ mod n. If the expected message is just a number with no particular format or padding, this attack might be very effective.
+
+In addition to the discussed forging attacks, the above defined signature has different drawbacks, for example, the size of the signature is at least the same as the size of the message, meaning that we have to send at least double the size of signed data.
+
+The properties we would like to have are:
+\begin{itemize}
+	\item \textbf{authenticity}: the origin of the message is correctly identified;
+	\item \textbf{non-repudiation}: the sender cannot deny the transmission of a message;
+	\item \textbf{integrity}: the information can be modified only by the authorized entities.
+\end{itemize}
+
+Can we assure integrity? If a message is bigger than the RSA modulus, we would need to split it into blocks, in this way the attacker may remove blocks.
+
+The solution to all these issues, including the problem of forging, is the adoption of \textbf{cryptographic hash functions}.
+\begin{definition}
+	A hash function h: X$\rightarrow$Z is a function taking an arbitrarily long message x and giving a digest z of fixed length.
+\end{definition} 
+
+When used in cryptography, these functions are required to satisfy specific properties that we discuss below through our running-example.
+
+We modify our proposed signature scheme based on RSA so to prevent all of the discussed problems. Let h be a hash function:
+\begin{align*}
+	Sig^h_{SK}(x) &= D_{SK}(h(x))\\
+	Ver^h_{PK}(x,y) &= 
+	\begin{cases}
+	true & \text{if}\  E_{PK}(y)=h(x)\\
+	false & \text{otherwise}
+	\end{cases}
+\end{align*}
+
+Thus, to sign x we decrypt its hash under the private key, to check the signature, we encrypt the signature under the public key, we recompute the hash on x and we compare the two results.
+
+Since the hash is of fixed length, it is enough to take it smaller than the RSA modulus to solve all the issues related to the size of the signature and the necessity of encryption modes.
+
+Let's consider the simplest attack (in the scheme without hash) where, given an arbitrary signature y, we compute the corresponding signed message as E$_{PK}$(y). In the hash-based scheme, E$_{PK}$(y) would provide the hash of the signed message, so if we are able to find an x such that h(h)=E$_{PK}$(y), we will have that Ver$^h_{PK}$(x,y)=true. this leads to our first property for cryptographic has functions.
+
+\begin{definition}
+	A hash function h is preimage resistant (or one-way) if given z it is infeasible to compute x such that h(x)=z. 
+\end{definition}  
+
+\begin{example}
+	Let's consider a simple hash function h(x) that splits the message x into blocks x$_1$, x$_2$, .., x$_n$ of a fixed size k and computes the bit-wise xor of all blocks:
+	\begin{align*}
+	h(x)=x_1 \oplus x_2 \oplus .. \oplus x_n.
+	\end{align*}
+	
+	This function is clearly not preimage resistant, given a digest z we can easily find preimages:\\
+	E.g., z, z||0, z||x||x, z||x||y||x$\oplus$y, .. here 0 denotes the block of k zeros and || the concatenation of blocks, all are correct preimages of z.
+\end{example}
+
+Notice that preimage resistance also prevents forging based on RSA multiplicative property. If we have two signed messages x$_1$, x$_2$ with signatures y$_1$ and y$_2$, then y$_1$*y$_2$ mod n is the signature of a message whose hash is the same as z=h(x$_1$)*h(x$_2$) mod n. Finding such message x means that we can compute a preimage x of h such that h(x)=z, but this is ruled out by preimage resistance.
+
+It appears that adopting hash-based RSA signature scheme in which the hash function is preimage resistant solves all the issues. Unfortunately, we also have to consider potential problems deriving from the adoption of hashes. Since a has summarizes messages as fixed-length digests, it can of course occur that different messages have the same hash. For example we might have different x$_1$ and x$_2$ such that h(x$_1$)=h(x$_2$). Then, Sig$^h_{SK}$(x$_1$)=Sig$^h_{SK}$(x$_2$), so the two messages have the same signature.
+
+Consider an attack in which, given a message x$_1$ and its signature y$_1$, the attacker computes a x$_2$ such that h(x$_1$)=h(x$_2$). Then y$_1$ is a valid signature for x$_2$, meaning that the attacker has forged a signature for a message of its choice.
 \end{document}
 
 

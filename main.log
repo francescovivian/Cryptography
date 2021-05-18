@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  15 MAY 2021 17:21
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (MiKTeX 2.9.7380 64-bit) (preloaded format=pdflatex 2020.4.1)  18 MAY 2021 17:53
 entering extended mode
 **./main.tex
 (main.tex
@@ -2613,14 +2613,22 @@ Overfull \hbox (5.80829pt too wide) in paragraph at lines 3428--3429
 od n)=parity(E$[]$(2x
  []
 
-[84] 
+[84] [85] [86
+
+]
+Overfull \hbox (34.45975pt too wide) in paragraph at lines 3526--3527
+\T1/cmr/m/n/12 mes-sage as E$[]$(y) and we for-ward this to the re-ceiver in-st
+ead of x. Since Ver$[]$(E$[]$(y),y)=true,
+ []
+
+[87] [88] 
 AED: lastpage setting LastPage
-[85]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3452.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 3452.
+[89]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 3584.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 3584.
  (main.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3452.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3452.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 3584.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 3584.
 
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
@@ -2633,13 +2641,13 @@ Package logreq Info: Writing requests to 'main.run.xml'.
 
  ) 
 Here is how much of TeX's memory you used:
- 36731 strings out of 480893
- 696093 string characters out of 2898027
+ 36752 strings out of 480893
+ 696389 string characters out of 2898027
  1413293 words of memory out of 3000000
  51254 multiletter control sequences out of 15000+200000
  556928 words of font info for 84 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 81i,13n,96p,827b,2484s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 81i,16n,96p,827b,2484s stack positions out of 5000i,500n,10000p,200000b,50000s
 {C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips/cm-super/cm
 -super-t1.enc}{C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/enc/dvips
 /inconsolata/i4-ts1.enc}{C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts
@@ -2679,9 +2687,9 @@ ers/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-super/sfrm172
 8.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cm-s
 uper/sfti1200.pfb><C:/Users/vivia/AppData/Local/Programs/MiKTeX 2.9/fonts/type1
 /public/cm-super/sfti1440.pfb>
-Output written on main.pdf (86 pages, 2497938 bytes).
+Output written on main.pdf (90 pages, 2513944 bytes).
 PDF statistics:
- 1323 PDF objects out of 1440 (max. 8388607)
- 621 named destinations out of 1000 (max. 500000)
+ 1362 PDF objects out of 1440 (max. 8388607)
+ 642 named destinations out of 1000 (max. 500000)
  198 words of extra memory for PDF output out of 10000 (max. 10000000)
 
