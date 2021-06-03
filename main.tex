@@ -3566,7 +3566,7 @@ Let's consider the simplest attack (in the scheme without hash) where, given an 
 	A hash function h is preimage resistant (or one-way) if given z it is infeasible to compute x such that h(x)=z. 
 \end{definition}  
 
-\begin{example}
+\begin{example}\label{ex:hashxor}
 	Let's consider a simple hash function h(x) that splits the message x into blocks x$_1$, x$_2$, .., x$_n$ of a fixed size k and computes the bit-wise xor of all blocks:
 	\begin{align*}
 	h(x)=x_1 \oplus x_2 \oplus .. \oplus x_n.
@@ -3581,6 +3581,100 @@ Notice that preimage resistance also prevents forging based on RSA multiplicativ
 It appears that adopting hash-based RSA signature scheme in which the hash function is preimage resistant solves all the issues. Unfortunately, we also have to consider potential problems deriving from the adoption of hashes. Since a has summarizes messages as fixed-length digests, it can of course occur that different messages have the same hash. For example we might have different x$_1$ and x$_2$ such that h(x$_1$)=h(x$_2$). Then, Sig$^h_{SK}$(x$_1$)=Sig$^h_{SK}$(x$_2$), so the two messages have the same signature.
 
 Consider an attack in which, given a message x$_1$ and its signature y$_1$, the attacker computes a x$_2$ such that h(x$_1$)=h(x$_2$). Then y$_1$ is a valid signature for x$_2$, meaning that the attacker has forged a signature for a message of its choice.
+
+\chapter*{Lecture 20}
+We remember that in a chosen-plaintext attack, the adversary can (possibly adaptively) ask for the ciphertexts of arbitrary plaintext messages. The adversary can interact with an encryption oracle, viewed as a black box.
+
+\begin{example}
+	During World War II, US Navy cryptoanalysts understood that Japan was planning to attack location "AF". They thought that "AF" could have stand for "Midway Island" as Hawaii Islands started with "A". To prove this, they asked the US forces at Midway to send a plaintext message about low supplies. The Japanese intercepted the message and reported to their superior thath "AF" was low on water, confirming the Navy's hypothesis and allowing them to position their force to win the battle.
+\end{example}
+
+\begin{definition}
+	A hash function is second-preimage resistant if given x$_1$, it is infeasible to compute x$_2$ such that h(x$_1$)=h(x$_2$).
+\end{definition}
+
+If we assume the attacker is allowed to ask for signatures (similarly to what happens in a chosen-plaintext attack), it might still happen that he chooses two different messages x$_1$ and x$_2$ (both of them) with the same hash and asks for a signature on x$_1$. In this way he obtains a valid signature for x$_2$.
+
+\begin{example}
+	Suppose the attacker manages to generate two messages that look the same, but one (x$_2$) gives more advantage than the other (x$_1$), such as in two contracts with different prices. The attacker convinces the other party to sign x$_1$ which looks reasonable but obtains a signature on x$_2$ that has an outrageous price in it. For this reason, we need a new property for hash functions.
+\end{example}
+
+\begin{definition}
+	A hash function is collision resistant if it is infeasible to compute different x$_1$ and x$_2$ such that h(x$_1$)=h(x$_2$). 
+\end{definition}
+
+Differently from second-preimage resistance, here the attacker can choose both x$_1$ and x$_2$ and he is not given an x$_1$ that he has to find a second-preimage of. Thus, this latter property implies the previous one, i.e., if a has is collision resistant, it is also second-preimage resistant.
+
+We need our has function to be collision resistant. It is possible to prove that collision resistance also implies preimage resistance. Thus, if a hash function is collision resistant, it has all of the above mentioned properties. This holds under the assumption that the number of messages we can hash is at least twice as the number of digests.
+
+\begin{theorem}
+	Let h:X$\rightarrow$Z be a collision resistant hash function such that |X|$\ge$2|Z|. Then h is also preimage resistant.
+\end{theorem}
+We prove the following equivalent fact: if h is not preimage resistant, then h is not collision resistant.
+
+To do so, we show that given an algorithm Invert(z) for inverting h (that breaks preimage resistance), we can write a Las Vegas probabilistic algorithm that finds a collision. The algorithm is, in fact, rather simple: we pick a random message, we compute its hash and we invert it using the given algorithm Invert(z). If we find a different message we are done, otherwise, if we are unlucky and get the initial message, we fail. the pseudocode of the algorithm is the following:
+\begin{python}
+FindCollisions:
+	choose a random x1 in X
+	z=h(x1)
+	x2=Invert(z)
+	if x1 != x2:
+		output(x1,x2)
+	else:
+		FAIL
+\end{python}
+
+If I fail, I run again the algorithm, picking another x1.
+
+Correctness of solution is obvious since x1 and x2 have the same hash, meaning that they have a collision. We now prove that failure happens with probability at most 1/2.
+
+\begin{proof}
+	Since we have |Z| possible digests, we have that Invert(z) returns exactly |Z| preimages, one for each digest, and these are the unlucky cases, i.e., the messages that once hashed will be mapped back to themselves. 
+	
+	Thus, the good cases are exactly |X|-|Z| and the probability of success is
+	\[\frac{|X|-|Z|}{|X|}\ge\frac{|X|-1/2|X|}{|X|}=\frac{1/2|X|}{|X|}=\frac{1}{2}.\]
+	
+	As a consequence, we fail with probability $\le$ 1/2. As any Las Vegas algorithm, this can be iterated as needed. For r iterations we have that the probability of failure is $\le$1/2$^r$.
+\end{proof}
+
+In the example \ref{ex:hashxor}, we showed that that hash function is not preimage resistant, since given a digest z, we can easily find preimages. Thus, it is also clearly not collision and second preimage resistant. Given x=x$_1$,x$_2$,..,x$_n$, we have for example that x$_2$,x$_1$,..,x$_n$ has the same digest, we can swap blocks as xor is commutative. Moreover, we can add zero blocks, add whatever block twice, add a block and then add it xored with the original message, and so on.
+
+\begin{example}
+	We consider another simple hash function g(x)=E$_{h(x)}$(0), i.e., we use the previous hash (the one with the xor) to obtain a key for a cipher and we encrypt the constant 0 under that key. This hash function is preimage resistant if the adopted cipher is resistant to known-plaintext attacks. In fact, finding h(x) from g(x) corresponds to breaking the cipher (h(x) is the key), knowing the plaintext 0 and the ciphertext g(x). However, it is neither collision resistant nor second preimage resistant, as collision on h (found given the xor) are collisions on g and we have shown above that h is not collision resistant.
+\end{example}
+
+\subsection*{The birthday attack}
+We have discussed important properties of hash functions that are needed, for example, when developing a hash-based signature scheme. Collision resistance is the strongest of such properties: it is important that hash functions are carefully designed so to make the computation of collisions infeasible. As for cryptography, the attacker can try to break a function by brute force.
+
+For the case of hash function, brute forcing is much simpler than expected, thanks to the so-called \textbf{Birthday Attack}. This funny name comes from an analogy to the famous birthday paradox: \textit{given a group of 23 people, with probability 1/2 there are at least two of them with the same birthday (day and month, not year). With a group of 41, the probability is already around 90\%}. This fact is so counter-intuitive to be called paradox.
+
+The analogy with cryptographic hash functions is immediate: birthday can be seen as a hash function from any person to a fixed-size set of 365 days of the year. Two people having the same birthday represent a collision on the hash function. The fact collisions are so likely means that brute-forcing a hash function might be much easier than expected, and we will give a precise estimate of this.
+
+We assume people being mapped to birthdays in a uniform way. This assumption fits very well with cryptographic hashes as they usually behave that way to make the find of a collision or a preimage as much hard as possible. We will now compute the probability that in a group of k people, none share the birthday.
+
+For the first person, any birthday is fine. Thus, we have probability 1 of success. The second person should not share the birthday with the first one, meaning that we have probability 364/365 of success, and so on. We require that these events all occur together, giving a probability of $\prod_{i=0}^{k-1}\frac{365-i}{365}$. So, the probability of a collision is 1-$\prod_{i=0}^{k-1}\frac{365-i}{365}$. The following python code compute this probability.
+\begin{python}
+from decimal import *
+def Birthday(k):
+	r=1
+	for in in range(k):
+		r = r*(365-1)
+	return 1 - (Decimal(r)/Decimal(365**k))
+\end{python}
+
+It is now useful to find a relation between the number giving probability 1/2 (in this case 23) and the number of digests, as this will allow us to estimate the cost of a brute force attack. We let n be the number of digests (365 for the birthday paradox). We reason as follows: the probability that we do not find a collision is \[\prod_{i=0}^{k-1}\frac{n-i}{n} = \prod_{i=0}^{k-1}\left(1-\frac{i}{n}\right).\]
+Now from analysis we know that, for small x, 1+x$\approx$e$^x$ (note that from Taylor series e$^x$=1+x+$\frac{x^2}{2!}$+$\frac{x^3}{3!}$+...).
+
+If 1+x $\approx$ e$^x$, then 1-1/n=e$^{-1/n}$. Thus, the probability of finding a collision is:
+\[\epsilon \approx 1-\prod_{i=0}^{k-1}e^{-\frac{i}{n}} = 1-e^{-\frac{(k-1)k}{2n}}.\]
+Thus 1-$\epsilon \approx e^{-\frac{(k-1)k}{2n}}$ and so we get ln(1-$\epsilon$)$\approx -\frac{(k-1)k}{2n}$. Thus 2$n$ ln(1/(1-$\epsilon$)) $\approx k^2-k$ (as log x$^n$ = n log x, here n=1).\\By a further approximation (disregarding k), we get k $\approx\sqrt{2n \ \text{ln}(1/(1-\epsilon))}$.
+
+For $\epsilon$=1/2, this gives k$\approx$1.17$\sqrt{n}$. Thus, a brute-force attack on a hash function with n digests, finds a collision with probability 1/2 after about $\sqrt{n}$ attempts. For example, if a hash function returns digests of 128 bits, it takes about $\sqrt{2^{128}}=2^{64}$ trials to break it. So, to have the same security we have with a 128 bits cipher, we need double the length, i.e., 256 bits of hash.
+
+\subsection*{Commonly used hash functions}
+One of the most famous cryptographic hash function is \textbf{MD5} (Message Digest 5), by Ron Rivest (the 'R' of RSA). It is a 128-bits hash used in many applications. Recently, it has been shown to be not collision resistant, moreover the relatively small size allows for a birthday attack in only 2$^{64}$ steps. There exists a \textit{collision attack} that can find collisions within seconds on a computer with a 2.6 GHz Pentium 4 processor (complexity of 2$^{24.1}$). There is also a chosen-prefix attack that can produce a collision for two inputs with specified prefixes within hours, using off-the-shelf computing hardware (complexity 2$^{39}$).
+
+The most common alternative to MD5 is \textbf{SHA} (Secure Hash Algorithm). On 2/23/2017, Google announced the SHAttered attack, in which they generated two different PDF files with the same SHA-1 hash in roughly 2$^{63.1}$ SHA-1 evaluations. It is 100.000 times faster than brute forcing a SHA-1 collision with a \textit{birthday attack}, which is estimated to take 2$^{80}$ SHA-1 evaluations. The attack required "the equivalent processing power as 6.500 years of single-CPU computations and 110 years of single-GPU computations". The second generation SHa (SHA-2) has a variable digest size from 224 to 512 bits. It is not vulnerable to the collision attacks and the length makes birthday attack infeasible. The NIST has selected SHA-3, with a process similar to the one for selection AES. SHA-3 is the one that we should use in practice.
 \end{document}
 
 
