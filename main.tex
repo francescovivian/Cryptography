@@ -3675,6 +3675,164 @@ For $\epsilon$=1/2, this gives k$\approx$1.17$\sqrt{n}$. Thus, a brute-force att
 One of the most famous cryptographic hash function is \textbf{MD5} (Message Digest 5), by Ron Rivest (the 'R' of RSA). It is a 128-bits hash used in many applications. Recently, it has been shown to be not collision resistant, moreover the relatively small size allows for a birthday attack in only 2$^{64}$ steps. There exists a \textit{collision attack} that can find collisions within seconds on a computer with a 2.6 GHz Pentium 4 processor (complexity of 2$^{24.1}$). There is also a chosen-prefix attack that can produce a collision for two inputs with specified prefixes within hours, using off-the-shelf computing hardware (complexity 2$^{39}$).
 
 The most common alternative to MD5 is \textbf{SHA} (Secure Hash Algorithm). On 2/23/2017, Google announced the SHAttered attack, in which they generated two different PDF files with the same SHA-1 hash in roughly 2$^{63.1}$ SHA-1 evaluations. It is 100.000 times faster than brute forcing a SHA-1 collision with a \textit{birthday attack}, which is estimated to take 2$^{80}$ SHA-1 evaluations. The attack required "the equivalent processing power as 6.500 years of single-CPU computations and 110 years of single-GPU computations". The second generation SHa (SHA-2) has a variable digest size from 224 to 512 bits. It is not vulnerable to the collision attacks and the length makes birthday attack infeasible. The NIST has selected SHA-3, with a process similar to the one for selection AES. SHA-3 is the one that we should use in practice.
+
+\chapter*{Lecture 21}
+Message Authentication Codes (MACs) are hash functions that use a symmetric key and with them we can achieve authentication. They produce a fixed-size digest of a message whose value depends on the given key. The property we require is similar to what we asked for signatures: without knowing the key k, it should be computationally infeasible to find a message x and a MAC y such that MAC$_k$(x)=y, i.e., such that y is the MAC for x under key k.
+
+The MAC is checked by recomputing it and comparing with the received one. For example, consider:
+\[A\xrightarrow[]{x,MAC_k(x)}B.\]
+After receiving the message, B recomputes MAC$_k$(x) and compares the result with the received MAC. If they match, he can conclude that the message comes from A. B can recompute the message because he is the only one that has the shared key of A.
+
+We will see two ways of implementing MAC. The first one is using the CBC (Figure \ref{fig:encCBC} and \ref{fig:decCBC}), how can we use it to implement MAC? A simple example is using a zero IV and taking as the digest the last encrypted block. We can so define MAC$_k$(x)=y$_n$. We just have to agree on which cipher to use.
+
+Intuitively, since this block depends on all the previous ones (thanks to the chaining), the last block summarizes all the content of message x, and it clearly depends on the key k. The fact we use a cipher, should also make it hard to forge a MAC without knowing the key. We will now see why the proposed MAC is not satisfactory (due to a simple chosen-text forgery) and how to improve it.
+
+\begin{example}
+	Suppose to have a 1-block message x and the relative MAC$_k$(x). 
+	
+	We have that MAC$_k$(MAC$_k$(x)) = E$_k$(E$_k$(x)) = MAC$_k$(x||0). x||0 stands for "x composed zero", it is a message composed by two blocks, x and zero.
+	
+	Thus, if the attacker asks (\textbf{chosen-text attack}) for the MAC of MAC$_k$(x) (i.e., MAC$_k$ (MAC$_k$(x))), he obtains a MAC for the two-blocks message x||0.
+\end{example}
+
+\begin{example}
+	The following less-trivial forgery allows for more control on the attacked message. Let's consider two 1-block messages with their MACs: x$_1$, MAC$_k$(x$_1$) and x$_2$, MAC$_k$(x$_2$). Let H$_1$=MAC$_k$(x$_1$) and H$_2$=MAC$_k$(x$_2$). Then, for how CBC works:
+	\begin{align*}
+	MAC_k(x_1||z) &= E_k(H_1 \oplus z)\\
+	&= E_k(H_1 \oplus H_2 \oplus z \oplus H_2)\\
+	&= MAC_k(x_2||H_1 \oplus H_2 \oplus z)
+	\end{align*}
+	Thus, if the attacker wants to extend message x$_1$ with an arbitrary second block z, he can ask for the MAC of
+	\[x_2||H_1 \oplus H_2 \oplus z.\]
+	The obtained MAC will be valid for message x$_1$||z.
+\end{example}
+
+To prevent these forgeries, the ISO/IEC 9797-1 standard adds additional transformations to the final encrypted CBC block. For example, given an additional key k', we define
+\[MAC_k(x) = E_k(D_{k'}(y_n)).\]
+Changing the last step is a way to avoid that MACs can be forged from MACs of shorter messages, as above done.
+
+Another way to implement MACs is to base them on cryptographic hash functions. The most famous is called HMAC, by Mihir Bellare, Ron Canetti and Hugo Krawczyk. The idea is to iterate a given hash function \textbf{h} over blocks of B bytes, typically we take B as 64 bytes (512 bits). We let
+\begin{center}
+	ipad = the byte 0x36 repeated B times;\\
+	opad = the byte 0x5C repeated B times.
+\end{center} 
+\[HMAC_k(x) = h(k_p \oplus opad, h(k_p \oplus ipad, x))\]
+where k$_p$ is obtained from k by appending 0 up to the byte length B. We have authentication+integrity but no non-repudation (we both have the same key). We will not see nor how the hash function \textit{h} works nor why it is correct.
+
+The authors show that if an attacker is able to forge HMAC, then he is also able to find collisions on the underlying hash function (even when fed with a random secret as done here). Thus, if the hash function is collision resistant than HMAC is unforgeable.
+
+What is the difference between MACs and signatures, given that they seem to provide very similar guarantees? Think of Alice sending to Bob a contract x. To prove authenticity (so that the message comes from Alice), she can decide to either sign it as Sig$_{SK}$(x) with her private key SK or compute a MAC as MAC$_k$(x) under a key k shared with Bob. After receiving the message, Bob checks the signature or recomputes the MAC to verify its authenticity.
+
+What now if Alice denies to have ever sent x to Bob? In other words, has Bob a way to show to a third party (a judge) that the contract is from Alice? Here it becomes crucial the symmetry of the key: Alice is the only one knowing her private key SK while both Alice and Bob know the shared key K. It is clear that, while signature can only be generated by Alice, a MAC can be easily forged by Bob. This important difference can be summarized by stating that MACs never provide non-repudation and, more specifically, they do not allow to prove authenticity to a third party.
+
+\section*{Protocols}
+Let's now assume that we are a user and we want to authenticate to a website, can we do it without problems? Passwords and PINs suffer from interception and replay: an attacker sniffing a password can reuse it arbitrarily to authenticate. This can be improved using OTPs (passwords that are never reused), but even in this case, if the attacker is in the middle, he can sniff the password in transit and use it to authenticate once.
+
+The problem with passwords and PINs is that we prove their knowledge by exhibiting the secret value. Strong authentication techniques, instead, allow for proving the knowledge of a secret without showing it. This can be achieved by showing a value that depends on the secret but does not allow to compute it. So we prove that we know the secret without showing the secret itself.
+
+We will discuss strong authentication protocols based on symmetric-key cryptography. The secret shared among the claimant and the verifier is a symmetric cryptographic key. In order to prove the knowledge of the key K, and thus her identity, the claimant sends to the verifier a message encrypted under K. Since generating an encrypted message without knowing the key is assumed to be infeasible, this proves its knowledge.
+
+The general idea is to have a challenge and a response:
+\begin{itemize}
+	\item \textbf{challenge:} the verifier challenges the claimant to send a particular message encrypted under K;
+	\item \textbf{response:} the claimant sends the required message.
+\end{itemize}
+
+\begin{example}
+	A challenge might be "\textit{send me your name encrypted under K}". The response from Alice would then be E$_k$(Alice). The verifier decrypts the message and checks if it matches name Alice. However, even if it does not reveal K, if the challenge is always the same, an attacker can simply intercept E$_k$(Alice) and replay it to authenticate as Alice. We thus have that the challenge should never be the same. A way to achieve this is to add a \textit{time-variant} parameter.
+	
+	The challenge becomes then "\textit{send me your name and your sequence number encrypted under K}", with response E$_k$(Alice, seq$_A$). We note the protocol as:
+	\begin{center}
+		A $\rightarrow$ B: E$_k$(A, seq$_A$).
+	\end{center}
+	The sequence number of Alice is then increased by 1 so that it never repeats. We are following the same idea behind OTPs: we never send the same response twice, so that it cannot be replayed.
+	
+	The verifier has to store the last sequence number from Alice, so that he can decrypt the message and check that both "Alice" and the sequence number (increased by 1) match. In this case he accepts Alice identity and increments the sequence number so that it is ready for next authentication.
+\end{example}
+
+Sequence numbers have the drawback of requiring the verifier to store the last sequence number of each possible claimant. Moreover, it is unclear what to do if for any reason (system or network failure), the sequence numbers go out of sync, restarting from 0 is unacceptable since any old authentication would become reusable by an attacker. An authenticated protocol to resync is necessary, but it cannot be based on sequence numbers.
+
+\begin{example}
+	Another challenge could be "\textit{send me your name and a recent timestamp encrypted under K}", and so the protocol is:	
+	\begin{center}
+		A$\rightarrow$B: E$_k$(A, t$_A$).
+	\end{center}
+	The timestamp t$_A$ is the time at the local clock of Alice when sending the message. The verifier decrypts the message and sees if Alice's name matches. Then he extracts a local timestamp t$_B$ and verifies that t$_B$-t$_A$<W, where W is the acceptance-window, i.e., the maximum allowed delay for the received message. For example, if W is 1 minute, the timestamp of A has to be at most 1 minute behind the timestamp of B.
+\end{example}
+
+In order to prevent replays, we should now pick W so that it is big enough to receive hones messages but so small that no replay will ever be accepted (with replays we mean messages sent by an attacker). It is very hard in practice since delays on networks can vary a lot. So, W is typically taken bigger than the average delivery time. To avoid replays, all the received timestamps are buffered, so that double-reception of a valid timestamp can be easily checked. Periodically, the expired timestamps (out of W) in the buffer are deleted.
+
+\begin{example}
+	Consider the following message, intercepted by the attacker:
+	\begin{center}
+		A$\rightarrow$B: E$_k$(A, t$_A$).
+	\end{center}
+	Bob accepts Alice's identity and stores in the buffer. The attacker E, tries a replay still inside W (we write E(A) to note the attacker pretending to be Alice):
+	\begin{center}
+		E(A)$\rightarrow$B: E$_k$(A, t$_A$).
+	\end{center}
+	The timestamp is still valid, but Bob finds it in the buffer and refuses authentication. Later, when t$_A$ expires, it is deleted from the buffer. Any further attempt of replay from the attacker will be refused as t$_A$ is out of W. 
+\end{example} 
+
+Timestamps do not require to store any per-user information (such as sequence numbers), it is enough to temporarily buffer the received-and-still-valid timestamps. Moreover, in case synchrony is lost, it is enough to synchronize local clocks. However, this synchronization should be authenticated, as malicious changes in clocks might easily allow the attacker to make old timestamps valid or to prevent any honest message to be accepted. As for sequence numbers, this authenticated synchronization cannot be implemented based on timestamps.
+
+We have seen that sequence numbers and timestamps are based on some form of authenticated synchronization. We thus need at least one time variant parameter that does not assume any form of synchronization and can be used, if needed, to synchronize sequence numbers and clocks. \textbf{Nonces} are "numbers used only once". Here the challenge implies an additional message from the verifier to the claimant containing the nonce. The challenge can be "\textit{send me your name and nonce encrypted under key K}":
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: E$_k$(A, N$_b$).
+\end{center}
+Bob generates a random nonce and sends it to Alice. He then decrypts the received message and checks if it matches. In this case he accepts Alice identity.
+
+If nonces are big enough (e.g., 128 bits), picking them at random implies that the probability of reusing the same nonce is negligible. Thus, any replay will be prevented since the nonce will mismatch with overwhelming probability.
+\begin{example}
+	An example is the following:
+	\begin{center}
+		B$\rightarrow$E(A): N$'_B$;\\
+		E(A)$\rightarrow$B: E$_k$(A, N$_B$).
+	\end{center}
+	Bob refuses it since N$_B$$\ne$N$'_B$.
+\end{example}
+
+\subsection*{Attacks on cryptography}
+Since challenge-response protocols provide cryptographic material to the attacker, it is important to avoid as much as possible scenarios that facilitate cryptanalysis. For example, the protocol:
+\begin{center}
+	A$\rightarrow$B: E$_k$(A, t$_A$)
+\end{center}
+is likely to provide a known-plaintext scenario, since it is not hard to guess the value of Alice time-stamp, with some approximation.
+
+More critically, the protocol:
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: E$_k$(A, N$_B$)
+\end{center}
+provides a (partial) chosen-plaintext scenario where the attacker can ask for encryption of any plaintext A, z with arbitrary z. In fact it is enough for the attacker to impersonate Bob, noted as E(B), and to send as nonce:
+\begin{center}
+	E(B)$\rightarrow$A: z;\\
+	A$\rightarrow$E(B): E$_k$(A,z).
+\end{center}
+In this case, Alice becomes a sort of encryption oracle.
+
+To avoid these problems, a typical countermeasure is to randomize cryptography. This can be done in different ways. For example, by adding a random padding to the plaintext. At a logical level, we can think of appending a random number R$_A$ that we call "confounder" as follows:
+\begin{center}
+	A$\rightarrow$B: E$_k$(A, t$_A$, R$_A$)
+\end{center}
+and
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: E$_k$(A, N$_B$, R$_A$).
+\end{center}
+
+In this way, the known and chosen-plaintext scenario are prevented. When decrypting, the random confounder will be ignored by Bob. We will always assume this form of randomization at the cryptographic level, with no need of making it explicit at the protocol level.
+
+\begin{exercise}
+	Prove that 11 is a prime number using the Miller-Rabin test.\\
+	
+	Prime(11):\\
+	n=11, n-1=10=2*5, so k=1 and m=5.\\
+	We pick a random a such that 1<a<n, for example a=2.
+	b = a$^m$ mod n = 2$^5$ mod 11 = 32 mod 11 = 10.\\
+	We enter the loop (i=0), b is equal to n-1 so the algorithm returns \texttt{True}.
+\end{exercise} 
 \end{document}
 
 
