@@ -4036,7 +4036,217 @@ Next messages, encrypted under such keys, will all "pass through" the attacker a
 
 Alice and Bob believe to communicate in a secure, encrypted way, but the attacker is in fact decrypting and re-encrypting any message they exchange.
 
-Diffie-Hellman protocol is secure only against passive attackers. The absence of any pre-shared secret makes it impossible to authenticate parties. An attacker can easily pretend to be one party and mount man-in-the-middle attacks, as shown above. This protocol can be made secure using digital signatures (to provide authentication). 
+Diffie-Hellman protocol is secure only against passive attackers. The absence of any pre-shared secret makes it impossible to authenticate parties. An attacker can easily pretend to be one party and mount man-in-the-middle attacks, as shown above. This protocol can be made secure using digital signatures (to provide authentication).
+
+\chapter*{Lecture 23}
+The point-to-point protocols we have studied so far assume a pre-shared key K between Alice and Bob. This does not scale if we have many users as we should share different keys for any possible pairs (meaning a squared number of keys with respect to the number of users). For this reasons, we need a centralized trusted server that behaves as \textbf{Key Distribution Center (KDC)}, a service for distributing new session keys to any pair of users asking for them. The KDC shares one key with each user U, noted as K$_U$, and users do not directly share keys among them. When a new user Alice is added, she just needs to register to the KDC and gets her new key K$_A$.
+
+One of the most famous key-establishment protocols based on symmetric-key cryptography and on a KDC, is the \textit{Needham-Schroeder shared-key protocol} (omitted). \textit{Kerberos} is a distributed authentication service originating from the MIT Project Athena. Its core key establishment and authentication protocol derives from the Needham-Schroeder protocol, it adds \textit{lifetimes} (validity periods) to keys and provides mutual confirmation (omitted).
+
+Let's see how a KDC works. A and B want to communicate using symmetric key cryptography and a trusted KDC. They only know their individual key K$_{A-KDC}$ and K$_{B-KDC}$, respectively, for communicating securely with the KDC.
+\begin{center}
+	A$\rightarrow$KDC: K$_{A-KDC}$(A,B);\\
+	KDC$\rightarrow$A: K$_{A-KDC}$(R1, K$_{B-KDC}$(A, R1));\\
+	A$\rightarrow$B: K$_{B-KDC}$(A, R1).
+\end{center}
+
+R1 is a random number used as future 1-time session key. In this way, first Alice and then Bob will know R1 and they use it as key.
+
+One technique to authenticate and perform session key establishment is to have a centralized KDC service that shares a symmetric key with any registered user. It make sense in local, controlled environment (such as a computer science department or a private company). It cannot scale to a wide area network such as the Internet, where entities cannot be all registered under a centralized server.
+
+\subsection*{Asym-key authentication}
+Asymmetric-key protocols are more suitable in this settings, as they allow for authentication and key-establishment without the presence of on-line servers. We discuss how the previous techniques need to be modified when asymmetric-key cryptography is employed.
+
+Let us start from a basic, flawed, unilateral authentication protocol based on timestamps, inspired to the one we proposed for symmetric-key encryption:
+\begin{center}
+	A$\rightarrow$B: E$_{PK_B}$(A, t$_A$).
+\end{center}
+
+Alice sends her name and a valid timestamp to Bob, both encrypted under Bob's public key PK$_B$. This protocol is not correct, since any user can send the very same message to Bob, given that is public. For example the attacker can easily pretend to be Alice as follows:
+\begin{center}
+	E(A)$\rightarrow$B: E$_{PK_B}$(A, t$_{E(A)}$).
+\end{center}
+Asymmetric-key encryption never proves the knowledge of a secret as it only requires the knowledge of PK$_B$. Decryption, instead, can be done only when the private key is known.
+
+Thus, a correct unilateral authentication protocol can be obtained by challenging Alice to decrypt something. The more natural way to achieve this is to adapt a Nonce-based authentication scheme:
+\begin{center}
+	B$\rightarrow$A: E$_{PK_A}$(N$_B$, B);\\
+	A$\rightarrow$B: N$_B$.
+\end{center}
+Bob sends a nonce N$_B$ encrypted together with his identifier under the public key of Alice. Only knowing Alice's private key, it is possible to decrypt the nonce and send back its value in the clear. This proves the knowledge of a secret that only Alice is assumed to possess and provides authentication. The presence of the time-variant nonce prevents possible replays. The reason why it is important to specify the identifier in the first message is to prevent man-in-the-middle attacks. The unilateral authentication protocol above can be extended using the \textit{Needham-Schroeder public-key protocol} in order to provide mutual authentication.
+
+\subsection*{Signature-based authentication protocols}
+Another way to provide authentication and key-establishment using asymmetric-key is combining asymmetric-key encryption and digital signatures. Encryption is needed to protect key confidentiality while signature gives authentication.
+
+We start from the basic, flawed unilateral protocol:
+\begin{center}
+	A$\rightarrow$B: E$_{PK_B}$(A, t$_A$, k$_S$).
+\end{center} 
+We add a signature from Alice to prove Alice's identity and this replaces Alice identifier. The timestamp can be sent in the clear. We include Bob's identifier in the signature, since it is important to specify the intended receiver of the authenticated exchange:
+\begin{center}
+	A$\rightarrow$B: t$_A$, E$_{PK_B}$(k$_S$, sign$_A$(B, t$_A$, k$_S$)).
+\end{center}
+Once B decrypts the message and verify the signature of A, he checks that t$_A$ and k$_S$ match with the two sent outside the signature. We have a problem: the message to encrypt will be typically bigger than the size of one block (for RSA, bigger than the modulus since the signature is already as big as the modulus). Implementing this protocol would amount to adopt some encryption mode, such as CBC, with strong integrity guarantees.
+
+A solution might be to separate encryption and signature as follows:
+\begin{center}
+	A$\rightarrow$B: t$_A$, E$_{PK_B}$(k$_S$), sign$_A$(B, t$_A$, k$_S$).
+\end{center}
+A symmetric key is typically much smaller than one encryption block for asymmetric key cryptography. E.g., we might have a 1024 bits RSA modulus and a 128 or 256 bits AES symmetric key.
+
+We still have a problem, anyone can decrypt what is inside the signature as it is not an encryption (so the attacker can get the key k$_S$). This protocol can be adopted only when the signature scheme prevents the computation of the signed message.
+
+A general solution is thus to first encrypt and then sign:
+\begin{center}
+	A$\rightarrow$B: t$_A$, E$_{PK_B}$(k$_S$, A), sign$_A$(B, t$_A$, E$_{PK_B}$(k$_S$, A)).
+\end{center}
+Since signature can be implemented using hashes, we do not have length issues whit this protocol. Alice identifier is in the encrypted message, since we want messages to be explicit about the parties involved in the protocol. More specifically, this prevents that an attacker intercepts the message and signs the (encrypted) key himself.
+
+This could be exploited in settings where the protocol gives credit, such as recharging a prepaid card, or getting an award submitting the solution to a problem. By signing the session key, the attacker will get credit for whatever is sent by Alice encrypted under k$_S$. Adding the identifier clearly prevents this attack since Bob will check that the identifier of the signature is the same as the one included in the encrypted message.
+
+\subsection*{X.509}
+If we run the above unilateral authentication protocol twice, we basically obtain the X.509 strong two-way authentication protocol (a standard):
+\begin{center}
+	A$\rightarrow$B: t$_A$, E$_{PK_B}$(k$^A_S$, A), sign$_A$(B, t$_A$, E$_{PK_B}$(k$^A_S$, A));\\
+	B$\rightarrow$A: t$_B$, E$_{PK_A}$(k$^B_S$, B), sign$_B$(A, t$_B$, E$_{PK_A}$(k$^B_S$, B)).
+\end{center}
+Alice and Bob compute a session key as k$_S$=f(k$^A_S$, k$^B_S$). Mutual authentication can also be achieved based on nonces as follows:
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: N$_A$, E$_{PK_B}$(k$^A_S$, A), sign$_A$(B, N$_A$, N$_B$, E$_{PK_B}$(k$^A_S$, A));\\
+	B$\rightarrow$A: N$_B$, E$_{PK_A}$(k$^B_S$, B), sign$_B$(A, N$_B$, N$_A$, E$_{PK_A}$(k$^B_S$, B)).
+\end{center}
+
+Practical authentication protocols based on symmetric keys require the presence of a centralised trusted party that shares one long-term key with each possible user. It is important to have a way to securely deal with these keys so that an attack to the KDC system would not necessarily compromise the keys of all users.
+
+\subsection*{Symmetric Key certificates}
+The trusted party possesses a master key k$_M$ that it only knows. When a new user U is registered, the respective long-term key k$_U$ is generated and is encrypted under the master key together with the identifier and additional information such as the key lifetime. E.g., SCert$_U$=E$_{k_M}$(U, k$_U$, L) certifies that user U has key k$_U$ with lifetime L.
+
+These certificates can be distributed to users together with their keys. Users can freely distribute their certificates to other users, since the encryption under the master key protects the confidentiality of the enclosed keys. The trusted party can completely forget about the keys and ask for certificates when needed.
+
+\subsection*{Asymmetric Key certificates}
+The idea of certificates is even more important for protocols based on asymmetric keys. It is crucial that key management is completely decentralised, since we do not want any on-line centralised server available at each protocol execution. The relevant property here is authenticity of public keys. If Alice and Bob want to communicate, they need a way to check that the public key is the one truly associated with the opposite party.
+
+Suppose Alice wants to send Bob a secret message M. It is insecure for Bob to simply send his public key to Alice:
+\begin{center}
+	B$\rightarrow$A: PK$_B$;\\
+	A$\rightarrow$B: E$_{PK_B}$(M).
+\end{center}
+In fact, an attacker can replace PK$_B$ with his own key:
+\begin{center}
+	E(B)$\rightarrow$A: PK$_{E(B)}$;\\
+	A$\rightarrow$E(B): E$_{PK_{E(B)}}$(M).
+\end{center}
+The attacker can then decrypt the secret message.
+
+We need a mechanism that allows Alice to check that the received key is the one belonging to Bob. Public key certificates contain the same information as the symmetric key ones. Instead of being encrypted under a symmetric master key, they are signed by a Certification Authority (CA), a trusted entity that certifies the authenticity of user's public keys.
+
+\begin{center}
+	Cert$_B$ = B, PK$_B$, L, sign$_{CA}$(B, PK$_B$, L).
+\end{center} 
+
+If Alice knows the public key of the CA and Bob sends this certificate, then Alice can check the validity of the key and its association with Bob (B). The protocol becomes:
+\begin{center}
+	B$\rightarrow$A: Cert$_B$;\\
+	A$\rightarrow$B: E$_{PK_B}$(M).
+\end{center}
+The attacker cannot change the public key as he is not able to forge a signature from the CA.
+
+We will now show all the steps required to generate a "root" CA certificate, i.e., the self-signed certificate holding the CA public key that Alice and Bob use to verify their respective public keys. \textbf{OpenSSL} allows for executing all of these operations via command-line. The root CA key and certificate can be generated as follows:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{images/Lec23/cert1.png}
+	\caption{Generation of a certificate using OpenSSL.}
+	\label{fig:cert1}
+\end{figure}
+
+We now have a self-signed certificate \textit{cacert.pem} (option -x509) and a new private key \textit{cakey.pem}, protected via a pass phrase. If we want to use these as if they were from a CA, we need to save them in a directory structure as follows (index.txt and serial are needed for tracking certificate generation):
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.7]{images/Lec23/cert2.png}
+	\caption{Creation of the directory structure.}
+	\label{fig:cert2}
+\end{figure}
+
+Alice and Bob can now send to the CA their \textit{certificate signing requests} (CSRs) that the CA signs, producing two certificates that are given to the two users.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=1]{images/Lec23/cert3.png}
+	\caption{Request for the certificate.}
+	\label{fig:cert3}
+\end{figure}
+
+We now have a new key, let's say for Alice, in Alice\_key.pem and a CSR in Alice\_req.pem. The CSR is what we send to the CA to be signed, producing the final certificate for Alice public key. In particular, the CSR contains Alice public key but \textbf{not} the private key, so that it can be safely sent in the clear. Suppose the CA has received the CSR. It can now produce the certificate as follows:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{images/Lec23/cert4.png}
+	\caption{Production of the certificate.}
+	\label{fig:cert4}
+\end{figure}
+
+We have produced the certificate for Alice in file Alice\_crt.pem, signed by the CA. Suppose now that Bob wants to communicate with Alice and he possesses the CA root certificate cacert.pem. He can check Alice's certificate as follows:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{images/Lec23/cert5.png}
+	\caption{Check of Alice's certificate.}
+	\label{fig:cert5}
+\end{figure}
+
+This confirms that Alice's certificate is correctly signed by the CA represented by cacert.pem. The public key can be extracted from the certificate as follows:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.65]{images/Lec23/cert6.png}
+	\caption{Extraction of the public key.}
+	\label{fig:cert6}
+\end{figure}
+
+Of course Bob can query about the subject and email:
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.55	]{images/Lec23/cert7.png}
+	\caption{Query about subject and email.}
+	\label{fig:cert7}
+\end{figure}
+
+Now Bob can use this public key knowing that it belongs to Alice, as far as he trusts the DAIS CA identified by the cacert.pem certificate.
+
+When we connect to a website using https, the SSL/TLS protocol establishes a secure, encrypted session. The association of the identity and the public key of the Web server is checked using certificates and the symmetric key of the Web server is used to establish a new session key. Subsequent communication is encrypted under the session key. To allow for certificate check, browsers include a number of built in CA root certificates. For a website it is enough to require a website certificate from one of these official Ca's.
+
+If we connect to sites that have generated their own certificates, the browsers warn that something is wrong and that the certificate cannot be checked. It could be the case that there is a man-in-the-middle attacker setting up a fake site using a self signed certificate, and intercepting/modifying all subsequent messages (sniffing our credentials, modifying the bank transfers we perform, etc.). If we store permanently the certificate, next connections will be guaranteed to be with the same server, but this does not prevent we are under a man-in-the-middle attack right now, of course.
+
+\newpage
+\subsubsection{Certificate chains}
+
+\begin{wrapfigure}[14]{r}{0.4\textwidth}
+	%\centering
+	\includegraphics[width=0.37\textwidth]{images/lec23/chain.png}
+	\caption{Example of a certificate chain.}
+	\label{fig:certChain}
+\end{wrapfigure}
+
+Having just root Ca's signing any certificate in the world does not scale well. It is useful in practice to have different levels of certifications (maybe associated with countries, states, cities, etc.) so that the end user ca go to the "local" CA. To deal with this hierarchical organization of CA's, we need to be able to check certificate chains. The root CA certifies the next CA in the hierarchy and so on all the way to the end user.
+
+Once we provide the whole chain, it is enough to trust the root public key in order to check all the certificates in the path to the end user. 
+
+If Carol wants to communicate with Dave, she needs to send Dave the certificate chain from the root CA to herself: CA$_1$ certificate signed by CA$_{root}$, CA$_3$ certificate signed by CA$_1$ and Carol's certificate signed by CA$_3$. 
+
+\subsubsection{PGP}
+\begin{wrapfigure}[14]{l}{0.4\textwidth}
+	%\centering
+	\includegraphics[width=0.37\textwidth]{images/lec23/pgp.png}
+	\caption{Example of a PGP graph.}
+	\label{fig:pgp}
+\end{wrapfigure}
+\textbf{Pretty Goog Privacy (PGP)} does not require a centralised authority. It is a web-of-trust, any user can trust other users. The level of trust might be such that if Alice trust Bob, any other user certified by Bob is trusted by Alice. In a sense, each user can "elect" other users as CA's that can be trusted when signing certificates for other users. 
+
+This can be depicted as general graph with no roots: a path in the graph represents a chain of certificates from one user to another. If we trust the starting user, we can successfully verify the identity and public key of the final user in the path.
 \end{document}
 
 
