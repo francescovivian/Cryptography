@@ -3833,6 +3833,210 @@ In this way, the known and chosen-plaintext scenario are prevented. When decrypt
 	b = a$^m$ mod n = 2$^5$ mod 11 = 32 mod 11 = 10.\\
 	We enter the loop (i=0), b is equal to n-1 so the algorithm returns \texttt{True}.
 \end{exercise} 
+
+\chapter*{Lecture 22}
+We will now see some types of attacks on protocols.
+
+\subsubsection{Redundancy}
+Let's consider the following protocol:
+\begin{center}
+	A$\rightarrow$B: A, E$_k$(seq$_A$).
+\end{center}
+
+The identifier A is sent in the clear while the sequence number is encrypted. Assume that Bob only checks monotonicity of seq$_A$ so to deal more flexibly with networks delays: even if some message is lost, the next will be accepted as the sequence number will be bigger than the stored one.
+
+In this case, if the attacker sends an arbitrary message:
+\begin{center}
+	A$\rightarrow$B: A, z,
+\end{center}
+the probability that the decryption of z is a valid number, bigger than the stored one, is probably very high (especially if we start from small sequence numbers). Encrypting arbitrary numbers with no format or message redundancy makes it impossible to check the integrity of the decryption: a random z can always be decrypted in a meaningful arbitrary number.
+
+To mitigate we can put A inside the encryption, so once Bob decrypt the message at leas A should match. On the other hand, the attacker can also guess A, if it is N bits long, the probability that this happens is 1/2$^N$.
+
+There are standard techniques to add redundancy, for example we can enclose a one-way hash of the encrypted message, called witness, as in h(seq$_A$), E(seq$_A$). The hash is a proof that the sender knows the content of the message. When Bob decrypts, he checks if the hash of the decrypted message matches the received one. The attacker might send arbitrary w,z (hoping to correctly guess both) but with a hash of 128 bits the probability of passing the test (so that w coincides with a random z), would be 1/2$^{128}$, that is negligible. First of all the decryption of z has to be a number that could have been sent by A with respect to seq$_A$, and then w has to be the hash of that number. The fact the hash is one-way makes this technique applicable even when it is important to preserve the secrecy of the sent message.
+
+\subsubsection{Reflection}
+We will now see another reason why it is important to have the identifier encrypted together with a time variant parameter. Let's consider the protocol:
+\begin{center}
+	A$\rightarrow$B: A, E$_k$(t$_A$)
+\end{center}
+
+Suppose that Bob is allowed to run the same protocol to authenticate with Alice using the same shared key K:
+\begin{center}
+	B$\rightarrow$A: B, E$_k$(t$_B$).
+\end{center}
+
+The attacker can pretend to be Bob, written E(B), as follows:
+\begin{center}
+	A$\rightarrow$E(B): A, E$_k$(t$_A$);\\
+	E(B)$\rightarrow$A: B, E$_k$(t$_A$).
+\end{center}
+
+The message from Alice trying to authenticate with Bob is sent back (reflection) to Alice in a second session where the attacker pretends to be Bob. If this is fast enough to be in W, Alice accepts the identity of Bob (who is instead the attacker). Notice that this is not a replay: Alice has never received a timestamp before. She has generated it but never received it.
+
+This attack shows that the symmetry of the key is dangerous if there is no information in the ciphertext about who are the intended sender and receiver. As a matter of fact, it is enough to specify A or B, as far as Alice and Bob agree on what they expect to see in the message (even one bit would suffice, to indicate the first in alphabetical order, for example).
+
+\section*{ISO/IEC 9798-2 protocols}
+Protocols from the standard ISO/IES 9798-2 are exactly as the ones discussed above, apart that they enclose the identifier of the verifier B (to prevent reflection) instead of A.
+
+\subsubsection{One-pass unilateral authentication}
+\begin{center}
+	A$\rightarrow$B: E$_k$(ts$_a$, B),
+\end{center}
+where ts$_A$ is a timestamp or a sequence number.
+
+\subsubsection{Two-pass unilateral authentication}
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: E$_k$(N$_B$, B).
+\end{center}
+
+\subsubsection{Two-pass mutual authentication}
+Here Alice and Bob authenticate each other:
+\begin{center}
+	A$\rightarrow$B: E$_k$(ts$_A$, B);\\
+	B$\rightarrow$A: E$_k$(ts$_B$, A);
+\end{center}
+where ts$_A$ and ts$_B$ are either timestamps or sequence numbers. Notice that, this is just the composition of two independent unilateral authentication protocols.
+
+\subsubsection{Three-pass mutual authentication}
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: E$_k$(N$_A$, N$_B$, B);\\
+	B$\rightarrow$A: E$_k$(N$_B$, N$_A$).
+\end{center}
+This protocol can be understood starting from the composition of two unilateral authentications based on nonces:
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: N$_A$, E$_k$(N$_B$, B);\\
+	B$\rightarrow$A: E$_k$(N$_A$, A).
+\end{center}
+
+Including the nonce N$_A$ in the encryption of the second message is harmless and makes the two unilateral authentications tied in a unique mutual authentication session. The same holds for adding N$_B$ in the third message. Moreover, the fact that the intended receiver (Bob) is specified in the second message together with challenge N$_A$ (that is now encrypted) makes it possible to remove A from the last message, as it is enough to prevent reflections.
+
+\section*{Key exchange}
+Authentication is always preliminary to some other tasks that require identification. However, it is useless to adopt a strong-authentication protocol and then start an unprotected remote session. Let's consider
+\begin{center}
+	A$\rightarrow$B: E$_k$(ts$_A$, B);\\
+	A$\rightarrow$B: M$_A$.
+\end{center}
+The attacker can intercept message M$_A$ and substitute it with a different one. If used in this way, strong-authentication becomes the same as OTPs: the attacker, if in the middle, can impersonate the claimant once. This can be easily solve by exchanging a new (session) key while identifying. Since strong authentication is based on encrypted responses, one simple technique is to enclose the new key inside the ciphertext.
+
+\subsection*{ISO/IEC 11770-2 protocols}
+\subsubsection{One-pass unilateral key-establishment}
+\begin{center}
+	A$\rightarrow$B: E$_k$(ts$_A$, B, k$_s$)
+\end{center} 
+where ts$_A$ is a timestamp or a sequence number.
+
+\subsubsection{Two-pass unilateral key-establishment}
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: E$_k$(N$_B$, B, k$_s$).
+\end{center}
+
+\subsubsection{Two-pass mutual key-establishment}
+Here Alice and Bob authenticate each other:
+\begin{center}
+	A$\rightarrow$B: E$_k$(ts$_A$, B, k$^A_s$);\\
+	B$\rightarrow$A: E$_k$(ts$_B$, A, k$^B_s$),\\
+\end{center}
+where ts$_A$ ans ts$_B$ are either timestamps or sequence numbers. The session key is then computed as a function (for example a bitwise XOR) of the two subkeys k$_S$=f(k$^A_s$, k$^B_s$).
+
+\subsubsection{Three-pass mutual key-establishment}
+Here Alice and Bob authenticate each other:
+\begin{center}
+	B$\rightarrow$A: N$_B$;\\
+	A$\rightarrow$B: E$_k$(N$_A$, N$_B$, B, k$^A_s$);\\
+	B$\rightarrow$A: E$_k$(N$_B$, N$_A$, k$^B_s$).
+\end{center}
+As above, the session key is computed as k$_S$=f(k$^A_s$, k$^B_s$).
+
+In all the protocol we assume that A and B already share a key K. But what if we don't have K?
+
+\subsection*{Diffie-Hellman key agreement protocol}
+We have seen that sharing secret keys is fundamental for authenticating and running secure sessions. The \textit{Diffie-Hellman} key agreement protocol allows for "magically" establishing a fresh secret key between Alice and Bob with no need of pre-shared keys or secrets (using an insecure channel). The key can then be used in a symmetric key cipher.
+
+The schema is based on discrete logarithms. We choose a prime number \textit{p} and a generator \textit{a} of \{1, ..., p-1\}. A generator \textit{a} is a number such that
+\begin{center}
+	\{a$^1$ mod p, ..., a$^{p-1}$ mod p\} = \{1, .., p-1\}.
+\end{center} 
+In other words, if we rise \textit{a} to all the powers 1, ..., p-1 modulo n, we obtain all such numbers. In this sense, \textit{a} can be used to generate the group.
+\begin{example}
+	Let's see an example with a=5 and p=23:
+	\begin{table}[H]
+		\centering
+		\begin{tabular}{|c|c|}
+			\hline
+			5$^1$ mod 23 = 5 & 5$^{12}$ mod 23 = 18\\ \hline
+			5$^2$ mod 23 = 2 & 5$^{13}$ mod 23 = 21\\ \hline
+			5$^3$ mod 23 = 10 & 5$^{14}$ mod 23 = 13\\ \hline
+			5$^4$ mod 23 = 4 & 5$^{15}$ mod 23 = 19\\ \hline
+			5$^5$ mod 23 = 20 & 5$^{16}$ mod 23 = 3\\ \hline
+			5$^6$ mod 23 = 8 & 5$^{17}$ mod 23 = 15\\ \hline
+			5$^7$ mod 23 = 17 & 5$^{18}$ mod 23 = 6\\ \hline
+			5$^8$ mod 23 = 16 & 5$^{19}$ mod 23 = 7\\ \hline
+			5$^9$ mod 23 = 11 & 5$^{20}$ mod 23 = 12\\ \hline
+			5$^{10}$ mod 23 = 9 & 5$^{21}$ mod 23 = 14\\ \hline
+			5$^{11}$ mod 23 = 22 & 5$^{22}$ mod 23 = 1\\ \hline
+		\end{tabular}
+	\end{table}
+\end{example}
+
+It is possible to prove that for any prime \textit{p} there always exists at least one generator \textit{a}. When a generator exists, we can then define the discrete logarithm modulo \textit{p} of any number 1$\le$b$\le$p-1 as follows: log$_a^b$ is the power i such that a$^i$ mod p = b. For example with b=2, 5$^2$ mod 23 = 2.
+
+Computing the discrete logarithm modulo \textit{p} is infeasible for a big prime \textit{p} such that p-1 has at least a big prime factor (this is to prevent the use of the Pohlig-Hellman algorithm, which works well only when prime factors of p-1 are small). Diffie-Hellman protocol for key agreement picks one of such big primes \textit{p} and a generator \textit{a} of \{1, ..., p-1\}. The prime \textit{p} and the generator \textit{a} are public. Alice and Bob generate two secrets SA and SB and run the following protocol:
+\begin{center}
+	A$\rightarrow$B: a$^{SA}$ mod p;\\
+	B$\rightarrow$A: a$^{SB}$ mod p.
+\end{center}
+Alice and Bob compute the new key respectively as (a$^{SB}$)$^{SA}$ mod p and (a$^{SA}$)$^{SB}$ mod p, that clearly gives the same value. Computing the secrets from exchanged messages amounts to compute the discrete logarithm, that we have assumed to be infeasible. Thus, an attacker eavesdropping the exchanged traffic will never be able to compute the new exchanged key.
+
+\begin{exercise}
+	The prime p=23 and the generator a=5 are public. Alice chooses SA=6 and Bob chooses SB=15. What is the new key?
+	
+	The communications between A and B are:
+	\begin{center}
+		A$\rightarrow$B: a$^{SA}$ mod p = 5$^6$ mod 23 = 8;\\
+		B$\rightarrow$A: a$^{SB}$ mod p =5$^{15}$ mod 23 = 19.
+	\end{center}
+
+	Alice and Bob compute the new key respectively as:
+	\begin{center}
+		(a$^{SB}$)$^{SA}$ mod p = 19$^6$ mod 23 = 2;\\
+		(a$^{SA}$)$^{SB}$ mod p = 8$^{15}$ mod 23 = 2.
+	\end{center}
+	Alice and Bob now share the secret 2.	
+\end{exercise}
+
+\begin{wrapfigure}[15]{r}{0.4\textwidth}
+	%\centering
+	\includegraphics[width=0.37\textwidth]{images/lec22/dh.png}
+	\caption{Diffie-Hellman parameters generation using OpenSSL.}
+	\label{fig:dh}
+\end{wrapfigure}
+
+Even if Diffie-Hellman protocol has the nice above property about key confidentiality, the fact it is not based on any pre-shared secret, makes it completely vulnerable to active attackers that are able to intercept and introduce messages on the network. In particular, an attacker can mount a man-in-the-middle attack where he is able to impersonate Alice with Bob and Bob with Alice. This is achieved by establishing two different keys with them, so that he can be in the middle in the subsequent session. The attack works as follows:
+
+\begin{center}
+	A$\rightarrow$E(B): s$^{SA}$ mod p;\\
+	E(B)$\rightarrow$A: s$^{SE}$ mod p;\\
+	E(A)$\rightarrow$B: a$^{SE}$ mod p;\\
+	B$\rightarrow$E(A): a$^{SB}$ mod p. 
+\end{center}
+Now Alice and Bob respectively share with the attacker keys k$_S^1$=a$^{SA \ SE}$ mod p and k$_S^2$=a$^{SB \ SE}$ mod p.
+
+Next messages, encrypted under such keys, will all "pass through" the attacker as follows:
+\begin{center}
+	A$\rightarrow$E(B): E$_{ks^1}$(M$_A$);\\
+	E(A)$\rightarrow$B: E$_{ks^2}$(M$_A$);\\
+	B$\rightarrow$E(A): E$_{ks^2}$(M$_B$);\\
+	E(B)$\rightarrow$A: E$_{ks^1}$(M$_B$).
+\end{center}
+
+Alice and Bob believe to communicate in a secure, encrypted way, but the attacker is in fact decrypting and re-encrypting any message they exchange.
+
+Diffie-Hellman protocol is secure only against passive attackers. The absence of any pre-shared secret makes it impossible to authenticate parties. An attacker can easily pretend to be one party and mount man-in-the-middle attacks, as shown above. This protocol can be made secure using digital signatures (to provide authentication). 
 \end{document}
 
 
