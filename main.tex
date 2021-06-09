@@ -4247,6 +4247,148 @@ If Carol wants to communicate with Dave, she needs to send Dave the certificate 
 \textbf{Pretty Goog Privacy (PGP)} does not require a centralised authority. It is a web-of-trust, any user can trust other users. The level of trust might be such that if Alice trust Bob, any other user certified by Bob is trusted by Alice. In a sense, each user can "elect" other users as CA's that can be trusted when signing certificates for other users. 
 
 This can be depicted as general graph with no roots: a path in the graph represents a chain of certificates from one user to another. If we trust the starting user, we can successfully verify the identity and public key of the final user in the path.
+
+\chapter*{Lecture 24}
+\begin{exercise}
+	Exercise about the Miller-Rabin test.
+	\begin{enumerate}
+		\item Explain how the Miller-Rabin primality test works writing code/pseudocode/clear description by words.\\
+		The Miller-Rabin test is a probabilistic primality test, it is a NO-biased Montecarlo. This means that it is always correct if it returns False but can be wrong if it returns True. For this reason it is useful to iterate the algorithm a certain amount of times if we continue to get a Yes answer. With iterations we decrease a lot the probability of error, making it negligible.
+	
+\begin{python}
+Prime(n):
+	write n-1 as 2^k*m
+	pick a random a such that 1<a<n
+	b=a^m mod n
+	if b==1:
+		return True
+	for i in range (0,k): #we stop at k-1
+		if b==n-1:
+			return True
+		b=b*b mod n
+	return False
+\end{python}
+	
+		\item Apply the Miller-Rabin test to number 9.\\
+		Prime(9):\\
+		n=9, n-1=8=2$^3$*1, so k=3 and m=1.\\
+		We pick a random a such that 1<a<n, for example a=2, b=a$^m$ mod n=2$^1$ mod 9 = 2.\\
+		We enter the loop (i=0): b$\ne$10 $\rightarrow$b=2*2 mod 9=4\\
+		(i=1): b$\ne$10 $\rightarrow$ b=4*4 mod 9=7\\
+		(i=2): b$\ne$10 $\rightarrow$ b=7*7 mod 9=4\\
+		(i=3): we exit the loop and return False, we know for sure that 9 is not prime.
+		
+		\item What is an interesting application of the Miller-Rabin test to cryptography?\\
+		Miller-Rabin test can be used to generate the two big primes \textit{p} and \textit{q} used in the RSA cipher. We simply choose a big random number and we check with the test if it is prime or not, if it is not, we choose another one and repeat.
+	\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+	To improve an authentication login-password scheme, we suggest the following protocol:
+	\begin{center}
+		A$\rightarrow$B: A, E$_k$(pwd)
+	\end{center}
+	where A is the login, pwd is the password and k a long-term key shared between A and B.
+	\begin{enumerate}
+		\item The protocol does not improve the security. Illustrate a possible attack.\\
+		We could have a replay attack: an attacker could intercept the message and use it pretending to be A:
+		\begin{center}
+			E(A)$\rightarrow$B: A, E$_k$(pwd).
+		\end{center}
+		
+		\item Improve the protocol using two different techniques shown in class and illustrate how to avoid the previous attack.\\
+		We can avoid it in three different simple ways:
+		\begin{itemize}
+			\item using timestamps:
+			\begin{center}
+				A$\rightarrow$B: A, E$_k$(pwd, t$_A$);
+			\end{center}
+			\item using sequence numbers:
+			\begin{center}
+				A$\rightarrow$B: A, E$_k$(pwd, s$_A$);
+			\end{center}
+			\item using nonce:
+			\begin{center}
+				B$\rightarrow$A: N$_B$;\\
+				A$\rightarrow$B: A, E$_k$(pwd, N$_B$).
+			\end{center}
+		\end{itemize}
+	\end{enumerate}
+\end{exercise}
+
+\begin{exercise}
+	Consider the hash function
+	\begin{center}
+		h(X$_1$, .., X$_n$) = X$_1$ XOR b$_1$ XOR X$_2$ XOR b$_2$ .. X$_n$ XOR b$_n$,
+	\end{center}
+	where XOR is a bit-to-bit operation, X$_1$, .., X$_n$ are blocks of 256 bits and b$_i$ is a 256 bits representation of number i. Is h(X) a good hash function for a signature scheme? Explain in detail your answer.
+	\begin{enumerate}
+		\item Using preimage resistance:\\
+		A hash function h is preimage resistant (or one-way) if given z, it is infeasible to compute x such that h(x)=z. If we take z XOR b$_1$, we have h(X)=z and z is one block long. h(z XOR b$_1$) = (z XOR b$_1$) XOR b$_1$ = z. Thus, the function is not preimage resistant.
+		\item Using second-preimage resistance:\\
+		A hash function is second-preimage resistant if, given x$_1$, it is infeasible to compute x$_2$ such that h(x$_1$)=h(x$_2$). As h(X)=h(X$_1$, .., X$_n$)=z, if we take X$_{n+1}$=b$_{n+1}$ and X||X$_{n+1}$, we have h(X$_1$, .., X$_n$,X$_{n+1}$) = h(X,b$_{n+1}$) = z XOR b$_{n+1}$ XOR b$_{n+1}$ = z. Thus, the function is not second-preimage resistant and should not be used in a signature scheme.
+	\end{enumerate} 
+\end{exercise}
+
+\begin{exercise}
+	Define what Message Authentication Codes (MACs) are and illustrate the difference between MACs and signatures.
+	
+	MACs are hash functions with a symmetric key. They are cryptographic mechanisms for achieving authentication using symmetric keys. They produce a fixed-size digest of a message, whose value depends on the given key. They have a property: without knowing the key k, it should be computationally infeasible to find a message x and a MAC y such that MAC$_k$(x)=y, i.e., such that y is the MAC for x under key k.
+	
+	The MAC is checked by recomputing it and comparing with the received one. For example consider
+	\[A\xrightarrow[]{x,MAC_k(x)}B.\]
+	After receiving the message, Bob recomputes MAC$_k$(x) and compares the result with the received MAC. If they match, he can conclude that the message comes from Alice. 
+	
+	About the difference between MACs and signatures: think of Alice sending to Bob a contract x. To prove authenticity (that the message comes from Alice), she can decide to wither sign it as Sig$_{SK}$(x) with her private key SK or compute a MAC as MAC$_k$(x) under a key k shared with Bob. After receiving the message, Bob checks the signature or recomputes the MAC to verify the authenticity. What now if Alice denies to have ever sent x to Bob? Has Bob a way to show to a third party (a judge) that the contract is from Alice? Alice is the only one knowing her private key SK while both Alice and Bob know the shared key k. It is clear that, while signature can only be generated by Alice, a MAC can be easily "forged" by Bob. This important difference can be summarized by stating that MACs never provide non-repudiation and, more specifically, they do not allow to prove authenticity to a third party.  
+\end{exercise}
+
+\begin{exercise}
+	Describe the optimized version of the Sieve of Eratosthenes algorithm using code/pseudocode/a precise description in words and explain in which context we use it. Show its execution on the number 18.
+	
+\begin{python}
+import sys, math
+
+def Sieve(N):
+	Ns = int(math.sqrt(N))
+	sieve = set(range(2, N+1))
+	for p in range(2, Ns+1):
+		if p in sieve:
+			for q in range(p*p, N+1, p):
+				sieve.discard(q)
+	print(sieve)
+\end{python}
+This algorithm is used to generate all the primes between 1 and N.
+
+Sieve(18):\\
+Ns=int(Sqrt(18))=4, we take the lower part of the square root.\\
+sieve=\{2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18\}\\
+p=\{2,3,4\}\\
+p=2 in sieve, q=\{2$^2$=4, .., 18\}\\
+sieve=\{2,3,5,7,9,11,13,15,17\}\\
+p=3 in sieve, q=\{3$^2$=9, .., 15\}\\
+sieve=\{2,3,5,7,11,13,17\}\\
+p=4 not in sieve\\
+
+Sieve(18)=\{2,3,5,7,11,13,17\}.
+\end{exercise}
+
+\begin{exercise}
+	Formally describe the RSA cipher. Given p=3, q=5, a=7, encrypt x=3 and then decrypt it. Discuss the limits.
+	
+	In RSA we let n=pq, with p,q big prime numbers. We also let a and b be such that ab mod $\phi$(n) = 1.\\
+	The public key is (b.n) and the private is (a,n). We let P=C=Z$_n$
+	
+	E$_{PK}$(x) = x$^b$ mod n;\\
+	D$_{SK}$(y) = y$^a$ mod n.
+	
+	Encrypting x=3:\\
+	We have N=pq=3*5=15, $\phi$(15)=8. We need to choose b such that ab mod 8=1, so that 7b mod 8=1. We can use b=7 (this is not a good choice, a and b are equal!).
+	
+	E$_{PK}$(3) = 3$^7$ mod 15 = 12.\\
+	D$_{SK}$(12) = 12$^7$ mod 15 = 3.
+	
+	The limits are: p and q have to be big and we should not have the same number for a and b.
+\end{exercise}
 \end{document}
 
 
